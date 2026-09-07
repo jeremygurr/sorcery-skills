@@ -11,9 +11,16 @@ with the user, then write.
 
 ## Process
 
+### 0. Verify prerequisites
+
+Verify that the user has the `okf` command in their path. If not, tell them that they must install
+okf before you can proceed with this setup. They can install it through brew, if they are running a 
+mac: `brew install --cask okfcli/okf/okf` or from the github repo: `https://github.com/okfcli/okf`. 
+Guide them through installed it if needed, but don't move forward until it is successfully installed.
+
 ### 1. Modify AGENTS file
 
-Look inside of the AGENTS.md file at the top of this repo. 
+Look inside of the AGENTS.md file at the root of this repo. 
 
 If an `# Navigating this Repo` block already exists in the that file, update its contents in-place 
 rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
@@ -43,7 +50,15 @@ Parsing references in wiki pages rule) if they point to pages that seem relevant
 
 3. Synthesize the answer
 
-Write a response that are grounded in the wiki pages you read.
+Write a response that is grounded in the wiki pages you read.
+```
+
+In the same way, add/replace the following block in the AGENTS.md file:
+
+```markdown
+# Subagent settings
+
+- Maximum number of subagents at one time is 3. This adjusts max concurrency accordingly. 
 ```
 
 ### 2. Create directory structure

@@ -13,7 +13,9 @@ page, update entity/concept pages, and maintain the index and overview.
 
 ### 0. Load the SCHEMA
 
-read the wiki/SCHEMA.md file if it hasn't been already. 
+If: wiki/SCHEMA.md doesn't exist
+Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
+Else: read the wiki/SCHEMA.md file if it hasn't been read already. 
 
 ### 1. Get list of files that have changed
 
@@ -34,7 +36,7 @@ Exclude from this list .gitignore, AGENTS.md, and everything that matches the .g
 Each of these files in the list is called a source material file.
 
 If: There are more than 3 files in the list
-Then: Process each file in a subagent, using a maximum of 3 at a time. 
+Then: Process each file in a subagent, following the user specified limits for max subagents. 
 Else: Process each file sequentially.
 
 For each of those files, apply all of these steps:
@@ -194,14 +196,16 @@ okf index wiki/pages
 If the generator warns about a page with no frontmatter or a page lands in `Uncategorized`, fix 
 that page's frontmatter and rerun.
 
-### 11. Update `wiki/pages/overview.md`
+### 11. Update `wiki/overview.md`
+
+The Overview page does not have frontmatter, since it's not a normal wiki page. 
 
 Re-read the current overview (if it exists). If this source:
 - Introduces a significant concept: add it to "Key Entities / Concepts"
 - Shifts the overall understanding: update "Current Understanding"
 - Raises a new question: add it to "Open Questions"
 
-Update the frontmatter `generated:at:` datetime.
+Add a link at the bottom to the Index (`wiki/pages/index.md` file).
 
 ### 12. Record the operation
 
@@ -218,19 +222,21 @@ Per SCHEMA's **Operation Log & Commit Convention**:
 
   Wiki-Op: update
   ```
-- **Non-git wiki:** append to `wiki/log.md`:
-  ```
-  ## [<today>] update | <source title>
-  Pages written: <slug>
-  Pages updated: <comma-separated list>
-  ```
 
 ## Common Mistakes
 
-- **Appending chronological updates instead of editing in-place** — Wiki pages are living documents, not journals. Do not add sections like `## April 27 update:` or `**Update:**` followed by new content. Update the relevant section in-place, bump the `updated` frontmatter date, and record what changed in the operation log (a commit on a git wiki, or `log.md` otherwise). The log is the historical record; pages are the current truth.
-- **Skipping the backlink audit (step 8)** — A wiki's value compounds through bidirectional links. Always scan existing pages for entities this source introduces.
-- **Inventing `[[slug]]` links** — Never write a cross-reference to a slug you have not confirmed exists or are creating now. A link that resolves to nothing is a hallucinated link. Verify against the existing page set (`ls wiki/pages/`); see the Concept Identity rule in `SCHEMA.md`.
-- **Summarizing the abstract instead of synthesizing** — The Summary section should reflect your own synthesis, not a rephrased abstract.
+- **Appending chronological updates instead of editing in-place** — Wiki pages are living 
+  documents, not journals. Do not add sections like `## April 27 update:` or `**Update:**` followed 
+  by new content. Update the relevant section in-place, bump the `updated` frontmatter date, and 
+  record what changed in the operation log (a commit on a git wiki). The log is the historical 
+  record; pages are the current truth.
+- **Skipping the backlink audit (step 8)** — A wiki's value compounds through bidirectional links. 
+  Always scan existing pages for entities this source introduces.
+- **Inventing `[[slug]]` links** — Never write a cross-reference to a slug you have not confirmed 
+  exists or are creating now. A link that resolves to nothing is a hallucinated link. Verify against 
+  the existing page set (`ls wiki/pages/`); see the Concept Identity rule in `SCHEMA.md`.
+- **Summarizing the abstract instead of synthesizing** — The Summary section should reflect your 
+  own synthesis, not a rephrased abstract.
 
 ### 13. Commit
 

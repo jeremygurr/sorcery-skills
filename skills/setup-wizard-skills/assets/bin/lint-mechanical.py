@@ -17,15 +17,33 @@ import sys
 from datetime import date
 from pathlib import Path
 
-WIKI_ROOT = Path(__file__).resolve().parent.parent
+def _find_repo_root():
+    """Repo root = nearest ancestor of this file that contains wiki/pages.
+
+    Works whether the scripts live at <repo>/bin/ (SCHEMA pre-commit gate) or
+    <repo>/wiki/bin/ (setup-wizard copy, wiki-lint invocation).
+    """
+    d = Path(__file__).resolve().parent
+    while d != d.parent and not (d / "wiki" / "pages").is_dir():
+        d = d.parent
+    return d
+
+
+WIKI_ROOT = _find_repo_root()
 PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
 
-REQUIRED_FIELDS = ("title", "category", "summary", "tags", "sources", "created", "updated")
+# Required per-page fields per wiki/SCHEMA.md page templates (both resource and
+# concept pages carry these; `resource`/`sources` are type-specific and checked by
+# the schema, not here).
+REQUIRED_FIELDS = ("type", "title", "description", "tags", "generated", "updated")
 # Cross-reference forms (see config/link-style.md). Reading is permissive — match both so the
 # linter works on any wiki regardless of its link_style, and on wikis that mix the two forms:
 #   obsidian: [[slug]] or [[slug|display]]
-#   markdown: [[slug](pages/slug.md)]
-LINK_RE = re.compile(r"\[\[([^\]|]+?)(?:\|[^\]]*)?\](?:\(pages/[^)]*\.md\))?\]")
+#   markdown: [[slug](slug.md)] / [[slug](pages/slug.md)] / [[slug](/wiki/pages/slug.md)]
+# The markdown path is whatever the emitting page needs to reach the target
+# (relative from inside pages/, or prefixed from outside) — only the [[...]] slug
+# is captured; known-slug validation happens in the link checks below.
+LINK_RE = re.compile(r"\[\[([^\]|]+?)(?:\|[^\]]*)?\](?:\([^)]*\.md\))?\]")
 STALE_MARKERS = ("current", "latest", "recent", "state-of-the-art")
 YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")
 STALE_AGE_DAYS = 90
@@ -82,7 +100,9 @@ def links_in(text):
 
 
 def is_page(path):
-    return path.suffix == ".md" and not path.name.startswith("audit-")
+    # index.md is a generated artifact (okf index) — no frontmatter, not part of
+    # the link graph. audit-* reports are gitignored local-only artifacts.
+    return path.suffix == ".md" and path.stem != "index" and not path.name.startswith("audit-")
 
 
 def load_pages():
