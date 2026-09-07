@@ -14,9 +14,14 @@ with the user, then write.
 ### 0. Verify prerequisites
 
 Verify that the user has the `okf` command in their path. If not, tell them that they must install
-okf before you can proceed with this setup. They can install it through brew, if they are running a 
-mac: `brew install --cask okfcli/okf/okf` or from the github repo: `https://github.com/okfcli/okf`. 
-Guide them through installed it if needed, but don't move forward until it is successfully installed.
+okf before you can proceed with this setup. 
+
+Ways to install okf:
+1. If they have a mac: `brew install --cask okfcli/okf/okf`
+2. `go install github.com/okfcli/okf/cmd/okf@latest`
+3. Build from source: `git clone https://github.com/okfcli/okf.git && cd okf && make build`
+
+Guide them through getting okf installed if needed, but don't move forward until it is successfully installed.
 
 ### 1. Modify AGENTS file
 
