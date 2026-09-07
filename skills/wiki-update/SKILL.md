@@ -33,7 +33,11 @@ Exclude from this list .gitignore, AGENTS.md, and everything that matches the .g
 
 Each of these files in the list is called a source material file.
 
-For each of those files and apply all of these steps:
+If: There are more than 3 files in the list
+Then: Process each file in a subagent, using a maximum of 3 at a time. 
+Else: Process each file sequentially.
+
+For each of those files, apply all of these steps:
 
 ### 2. Read the source in full
 

@@ -326,11 +326,12 @@ from page frontmatter by `wiki/bin/okf`:
   `Uncategorized` section.
 
 ## Index Categories
-Categories: Sources | Entities | Concepts | Analyses | Modules | APIs | Decisions | Flows
+Categories: Sources | People | Places | Entities | Concepts | Analyses | Modules | APIs | Decisions | Flows
 
 Not all categories need to be used. A codebase will use categories like Sources, Modules, APIs, Decisions, 
 and Flows. A general purpose document or research repo may use Sources, Entities, Concepts, 
 Analyses. Use what is appropriate for the subject/concept/object being described. When in doubt, ask the user.
+For example, if the sources involve important people and places, include People and Places concept pages. 
 
 Note that the Category is written into the `type` field of frontmatter.
 
