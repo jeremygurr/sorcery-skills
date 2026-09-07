@@ -7,7 +7,15 @@ git clone http://127.0.0.1:3001/zarisoft/wizard-skills.git
 cd wizard-skills
 ```
 
-## 2. Link the skills into your pi skills folder (or whatever harness you are using):
+## 2. Remove the old wiki skills if you have them, since they now conflict
+``` bash
+rm -rf ~/.pi/agent/skills/wiki-*
+```
+
+These new skills don't have all of the features of the old wiki skills yet, but it has the ones we 
+mostly used, and will have the rest soon.
+
+## 3. Link the skills into your pi skills folder (or whatever harness you are using):
 ``` bash
 # Put this function in your shell profile so you can use it easily
 link_pi_skills() {
@@ -36,18 +44,27 @@ link_pi_skills() {
 
 # While in the wizard-skills folder:
 link_pi_skills skills
+
 ```
 
-## 3. Go to your project repo you want to use these skills on.
+By linking them instead of copying, whenever you do a pull on the skills repo, it will 
+automatically update the pi skills also. You could also just copy them of course, but 
+then you lose this easy to update mechanism. 
 
-## 4. Run the setup skill in pi:
+## 4. Go to your project repo you want to use these skills on, and start pi.
+``` bash
+cd /some/cool/project
+pi
+```
+
+## 5. Run the setup skill in pi:
 ```
 /skill:setup-wizard-skills
 ```
 
-## 5. Follow the instructions of the setup skill
+## 6. Follow the instructions of the setup skill
 
-## 6. Understand how it works. 
+## 7. Understand how it works. 
 
 This works a little differently than the other tools. 
 * It is meant to work smoothly alongside of the matt-pocock skills, so you should install those also.
@@ -57,10 +74,8 @@ This works a little differently than the other tools.
   ingested into the wiki. 
 * It is meant to automatically turn all queries about your source material into wiki lookups, no 
   special skill needed. 
-* It does NOT use the old wiki-skills, and it does conflict with them. So you'll need to remove them
-  if you have them installed. 
 
-## 7. Create the new wiki pages.
+## 8. Create the new wiki pages.
 
 ```
 /skill:wiki-update
@@ -81,7 +96,7 @@ When you make changes to your source material, just run wiki-update again before
 will use git logs to automatically determine exactly what files have changed since the wiki was
 last updated and only focus on those. 
 
-## 8. Go ahead and continue your coding / research analysis. 
+## 9. Go ahead and continue your coding / research analysis. 
 
 The wiki should automatically be consulted as needed when agents are trying to understand where
 something is happening in the code or answer deep research questions about large documents. 
@@ -91,9 +106,10 @@ if they don't I'm sure a decent AI model can figure it out.
 
 # Not yet done, but will be soon:
 
-* Will make an "approved" skill that you use after the /implement skill and have reviewed the
+* Will make an /approved skill that you use after the /implement skill and have reviewed the
   changes. The approved skill will commit and push the changes, close the ticket, and update
   the wiki.
 * Will add the split/merge wiki skills. This is needed for long term maintenance of large wiki
   libraries. 
 * Will add the audit skill. This is a much deeper review of a document to validate it's information.
+
