@@ -1,3 +1,29 @@
+# Philosophy
+
+The objective of these skills is to work along with the matt-pocock skills to build and maintain a
+wiki about the files in your project repo. When the agent is resolving requests about your project
+files, it consults the wiki files first, to figure out how things in your repo work and what files
+are relevant to look at in more detail to answer your questions. Without a wiki like this, every
+new prompt in your project has to load into the context a large number of files and it may still
+miss some files in the process. The wiki makes it faster and more reliable. 
+
+So you can choose how to update the wiki:
+- Manually run /wiki-update after you've made significant changes (I prefer this one)
+- Make a commit hook that automatically runs a update before each commit
+- Have it triggered automatically as a github action when a new merge into main has occurred
+- Have it triggered by another skill as part of a workflow
+
+# Notes
+
+- The SCHEMA.md file gets copied from the wizard-skills repo to your project. It contains
+  information about how the wiki is to be maintained. Generally you shuold not modify it, but if you
+  find a need to, and you want it to last for future projects, you should raise a PR to the
+  wizard-skills repo with that change. When you pull updates from the wizard repo and run the setup
+  skill, it will replace your SCHEMA file with what's in the repo. This file gets loaded into the
+  context only when needed (most wiki skills will need it).
+- Use AGENTS.md for local settings that apply to every prompt. The setup adds a couple sections to
+  it but otherwise will leave your changes alone. 
+
 # Setup
 
 ## 1. Clone the repo
@@ -114,7 +140,5 @@ if they don't I'm sure a decent AI model can figure it out.
 * Will make an /approved skill that you use after the /implement skill and have reviewed the
   changes. The approved skill will commit and push the changes, close the ticket, and update
   the wiki.
-* Will add the split/merge wiki skills. This is needed for long term maintenance of large wiki
-  libraries. 
 * Will add the audit skill. This is a much deeper review of a document to validate it's information.
 

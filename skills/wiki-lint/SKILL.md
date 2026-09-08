@@ -42,7 +42,11 @@ okf index wiki/pages
 okf lint wiki/pages
 ```
 
-Correct any problems it finds. 
+Ignore broken links warnings if they target outside of wiki/pages. The linter doesn't understand
+that that's ok in this case.  
+
+Correct any problems it finds if there's a clear correction course
+available. Otherwise ask the user what to do, giving them options if possible. 
 
 ### Phase 2 — deterministic checks (script, no LLM)
 
@@ -85,6 +89,8 @@ limited by concurrency limits specified in AGENTS.md). Give it the cluster's pag
 >   (near-duplicate titles / near-identical Description sections).
 > - `chronological-section` — a page body carries date-stamped journal headers (`## [Month]`,
 >   `**[Month] N update`) that should be integrated in-place.
+> - `missing-source-links` - a page refers to source material files, but does
+>   not link to them according to the requirements in SCHEMA.md .
 > - `addable-line-range` — a footnote citing a *text-addressable* raw file (markdown /
 >   plaintext / code / cached HTML) with no `L<start>-<end>` token. Exempt: PDFs, transcripts,
 >   live URLs — never flag those.
@@ -137,6 +143,10 @@ updated: { by: <current agent or harness name>/<current model>, at: <current tim
 ## 🟡 Orphan Pages
 - [[slug]] — no inbound links
   Fix: add link from [[related-page]], or delete if no longer relevant
+
+## 🟡 Missing Source Links
+- [[slug]] — references a source material but doesn't link to it
+  Fix: convert the references to proper source-path links
 
 ## 🟡 Contradictions
 - [[page-a]] says: "<claim>"
