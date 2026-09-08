@@ -77,14 +77,22 @@ sources:
 
 ## Wiki Link Style
 
-This section defines how cross-references and citation targets are written and parsed for wikis.
+This section defines how cross-references and citation targets are written and parsed for wikis.  
+The wiki documents, including the special wiki/overview.md file, may link not only to other wiki 
+pages, but to source material files directly. When a reference is to a particular line or range 
+within a document, line numbers can be added to the link in the format that github understands. 
+Any time a wiki document is referring to a source material file, it should link to that file. 
 
 ### Emit
 
 Use `[[slug](<path>)]` for every cross-reference and every citation target — a standard markdown 
 link wrapped in outer brackets. The display text is the slug verbatim. The outer brackets preserve 
 the visual `[slug]` cue from Obsidian; the inner link is what GitHub and other plain-markdown 
-renderers will make clickable.
+renderers will make clickable. 
+
+When a reference is to a certain line number or range of lines in a document, add that to the link 
+in the format github understands: [[slug](<path>#L4-8)] refers to lines 4-8 of the given path, for 
+example. 
 
 The same form is used in body prose, in index/list entries, and inside citation footnotes.
 
@@ -313,10 +321,8 @@ Wiki-Op: update
 `wiki/pages/index.md` is a generated artifact — never hand-edit it. It is rebuilt
 from page frontmatter by `okf`:
 - Run `okf index wiki/pages` **after** any operation that adds, removes, renames, or re-categorizes a page.
-- The generator groups pages by their Cateogry (stored in `type` in frontmatter), in the order categories are
-  listed under **Index Categories** below; within a type it lists pages alphabetically
+- The generator sorts pages alphabetically by their Title.
   Each entry is `- [[slug]] — description _(generated.at)_`.
-  If a Category has no pages, then that Category won't be shown in the index.
 - Pages whose filename matches `audit-*.md` are excluded (gitignored local-only
   artifacts). A page with an unrecognized or missing `type` lands in an
   `Uncategorized` section.
@@ -330,6 +336,43 @@ Analyses. Use what is appropriate for the subject/concept/object being described
 For example, if the sources involve important people and places, include People and Places concept pages. 
 
 Note that the Category is written into the `type` field of frontmatter.
+
+## The Overview File
+
+The wiki/overview.md file is a special file that is part of the wiki but lies outside of the main
+wiki/pages bundle.  It doesn't have any frontmatter, since it's not a normal wiki page, and so
+doesn't conform to OKF. 
+
+The overview file contains the map of the source materials in this repo, allowing an agent or human
+user to find their way around the repo efficiently. It serves as an entry point into the wiki, and
+through it's links, direct or indirect, all other wiki pages should be reachable. 
+
+It is normally produced or updated when the wiki-update skill is run, but the user may directly
+request it to be updated or rebuilt. 
+
+The top section of the overview page, called "Introduction", should be a high level summary of what this
+repo is about and what kinds of data it contains.
+
+The second section, called "Project Status". If the project is complete as is, and there's nothing
+interesting to put here, this section can be skipped. But in the case of a work in progress project,
+this section will describe recent accomplishments, what is currently being worked on, and what will
+be worked on in the near future.
+
+The third section, called "Key Concepts", should break down the most significant concepts covered in
+this repo. For coding repos this would include major frameworks, tools, or components being used.
+For research repos, this could be philosophical concepts, important people or places, or topics
+frequently discussed in the source material. Each should have a sentence or two describing it and
+then link to a deeper exploration page covering that topic. 
+
+At the bottom is a link to the Index (`wiki/pages/index.md`).
+
+### Building the Overview File
+
+Normally the overview file is updated as new source material is ingested into the wiki as part of
+the wiki-update skill. But if the user specifically asks to have the overview updated or rebuilt,
+then the agent will go through the index, reading about every document, and organize the overview as
+specified above. The agent can pull up linked documents from the index as needed to get further
+detail. 
 
 ## Conventions
 - These wiki skills should never modify anything outside of the wiki folder.

@@ -198,14 +198,9 @@ that page's frontmatter and rerun.
 
 ### 11. Update `wiki/overview.md`
 
-The Overview page does not have frontmatter, since it's not a normal wiki page. 
+Re-read the current overview (if it exists).
 
-Re-read the current overview (if it exists). If this source:
-- Introduces a significant concept: add it to "Key Entities / Concepts"
-- Shifts the overall understanding: update "Current Understanding"
-- Raises a new question: add it to "Open Questions"
-
-Add a link at the bottom to the Index (`wiki/pages/index.md` file).
+Create or update it as described in the SCHEMA.md doc. 
 
 ### 12. Record the operation
 
