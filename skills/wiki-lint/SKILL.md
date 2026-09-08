@@ -43,7 +43,7 @@ okf lint wiki/pages
 ```
 
 Ignore broken links warnings if they target outside of wiki/pages. The linter doesn't understand
-that that's ok in this case.  
+that that's ok in this case. Don't include these in the report. 
 
 Correct any problems it finds if there's a clear correction course
 available. Otherwise ask the user what to do, giving them options if possible. 

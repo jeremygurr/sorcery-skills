@@ -1,7 +1,7 @@
 ---
 name: approved
-description: Use after tickets have been implemented, but changes haven't been committed and ticket
-  hasn't been closed yet.
+description: Use after tickets have been implemented, but changes haven't been committed and the
+  ticket hasn't been closed yet.
 disable-model-invocation: true
 ---
 
@@ -20,5 +20,7 @@ Push the changes if an origin remote is defined.
 
 ## 3. Update wiki
 
-Run the /wiki-update skill. 
+Run the /wiki-update skill. After it completes successfully and is committed, push it if a remote
+origin exists. 
+
 

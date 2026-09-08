@@ -13,6 +13,9 @@ So you can choose how to update the wiki:
 - Have it triggered automatically as a github action when a new merge into main has occurred
 - Have it triggered by another skill as part of a workflow
 
+After implementing a ticket, you may run the /approved skill to commit, push, and /wiki-update your
+project. Every so often you should run a /wiki-lint to check standards and consistency in the wiki.
+
 # Notes
 
 - The SCHEMA.md file gets copied from the wizard-skills repo to your project. It contains
