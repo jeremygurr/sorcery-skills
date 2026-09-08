@@ -23,7 +23,7 @@ updated: { by: <current agent or harness name>/<current model>, at: <current tim
 
 # <Source Title>
 
-**Source:** <original source URL or file path>
+**Source:** <original source URL, or the repo-relative file path as a source path link>
 **Date updated:** <today>
 
 ## Summary
@@ -77,22 +77,40 @@ sources:
 
 ## Wiki Link Style
 
-This section defines how cross-references and citation targets are written and parsed for wikis.  
-The wiki documents, including the special wiki/overview.md file, may link not only to other wiki 
-pages, but to source material files directly. When a reference is to a particular line or range 
-within a document, line numbers can be added to the link in the format that github understands. 
-Any time a wiki document is referring to a source material file, it should link to that file. 
+This section defines how cross-references and citation targets are written and parsed for wikis.
+
+Two terms, two kinds of link target:
+
+- **slug** — the identity of a wiki page: `wiki/pages/<slug>.md`. A *slug reference* is a link to a wiki page.
+- **source path** — a repo-relative path to source material outside `wiki/` — any file or directory: code, docs, data, images, anything (e.g. `CONTEXT.md`, `docs/agents/`, `build.gradle`, `assets/diagram.png`). A *source path link* is a link pointing at one directly.
+
+Every wiki document — including the special `wiki/overview.md` — may link to wiki pages and to 
+source material, and is **expected to do both**: any mention of source material in prose, in a 
+list entry, or in a citation must be written as a source path link, never as a bare path in 
+text or backticks. A mention that names a source without linking it is a defect. The single 
+exception is the generated `wiki/pages/index.md`, which contains slug references only — never 
+source path links.
 
 ### Emit
 
-Use `[[slug](<path>)]` for every cross-reference and every citation target — a standard markdown 
-link wrapped in outer brackets. The display text is the slug verbatim. The outer brackets preserve 
-the visual `[slug]` cue from Obsidian; the inner link is what GitHub and other plain-markdown 
-renderers will make clickable. 
+Use `[[display](<path>)]` for every cross-reference and every citation target — a standard 
+markdown link wrapped in outer brackets. The outer brackets preserve the visual `[slug]` cue 
+from Obsidian; the inner link is what GitHub and other plain-markdown renderers will make 
+clickable. The display text depends on the target kind:
 
-When a reference is to a certain line number or range of lines in a document, add that to the link 
-in the format github understands: [[slug](<path>#L4-8)] refers to lines 4-8 of the given path, for 
-example. 
+- **Slug reference**: the display text is the slug verbatim.
+  - `see [[helaman](helaman.md)] for the account of the wars`
+- **Source path link**: the display text is a short readable name — the basename, a human 
+  name, or the full repo-relative path when that path is already short (e.g. 
+  `docs/README.md`). Source paths in code repos can be very deep; keep the depth in the 
+  link and the display text short and clickable.
+  - `the glossary [[CONTEXT.md](../../CONTEXT.md)] retires "piece"`
+  - `see [[docs/README.md](../docs/README.md)] for the overview`
+  - `the seam sits in [[ButterFly.java](../../../../src/main/java/com/amex/payments/verticle/components/ButterFly.java)]` — long path in the link, short text on the page
+
+When a reference is to a certain line number or range of lines in a document, add that to the 
+link in the format github understands: `[[slug](<path>#L4-8)]` or 
+`[[CONTEXT.md](../../CONTEXT.md#L4-8)]` refer to lines 4-8, for example.
 
 The same form is used in body prose, in index/list entries, and inside citation footnotes.
 
@@ -107,16 +125,23 @@ not to the wiki root. Since all slug pages live flat in `wiki/pages/`:
 - **From a page outside `wiki/pages/`** (e.g. `wiki/pages/index.md`, `wiki/overview.md`): the target is one directory down, so the path is `pages/<slug>.md`.
   - `- [[helaman](pages/helaman.md)] — the record of the priests`
   - Citation footnote: `[^1]: [[helaman](pages/helaman.md)] §3.2 — "..."`
+- **Source path links** leave `wiki/` entirely, so they climb with `../` — the only place 
+  `../` legitimately appears. From `wiki/pages/<slug>.md` the repo root is `../../`; from 
+  `wiki/overview.md` it is `../`; from `wiki/SCHEMA.md` it is also `../`.
+  - From a page in `wiki/pages/`: `[[build.gradle](../../build.gradle)]`
+  - From `wiki/overview.md`: `the [[domain glossary](../CONTEXT.md)]`, a directory: `[agent conventions](../docs/agents/)`
 
-Do not prefix with `wiki/` or `./pages/` from inside `pages/`, and do not use absolute-looking 
-paths such as `/wiki/pages/<slug>.md` — GitHub resolves those against the repository root, which 
-breaks when the repo is viewed in a subdirectory or rendered by non-GitHub tools.
+Do not prefix with `wiki/` or `./pages/` from inside `pages/`, and do not use root-absolute 
+paths such as `/wiki/pages/<slug>.md` or `/src/foo.java` — they are not page-relative, and 
+GitHub does not resolve them reliably for repos viewed in a subdirectory or rendered by 
+non-GitHub tools.
 
 Quick check before writing a link: *"From the file I'm editing, does this path reach the target 
 file?"* Open the target from the link and verify it exists.
 
-Drive-by citations (paths outside of `wiki/`, and bare URLs) are unchanged by link style — they are 
-not slug references.
+Source path links are **not** slug references — the slug regex below must not match them, and 
+slug-family / broken-link lints skip them (they are verified by file existence instead; see 
+Concept Identity). Bare URLs in drive-by citations are likewise unchanged by link style.
 
 ### Parse
 
@@ -142,7 +167,9 @@ works if the link graph is trustworthy, so two rules hold everywhere links are w
    resolve to an existing `wiki/pages/<slug>.md` **or** to a page being created in the
    same operation. List the existing page set first (`ls wiki/pages/`); never emit a
    link to a slug you have not confirmed. A `[[slug]]` that resolves to nothing is a
-   hallucinated link — the failure this discipline exists to prevent.
+   hallucinated link — the failure this discipline exists to prevent. The same rule
+   applies to **source path links**: before emitting one, confirm the resolved file or
+   directory exists (`ls <path>` from the repo root, or follow the page-relative path).
 
 2. **Homonyms get qualified slugs.** When a new concept collides with an existing slug
    for a *different* sense, qualify both with a discriminator rather than overloading
@@ -201,8 +228,10 @@ Three rules for every footnote:
 1. **The cited target is one of three forms:**
    - A slug reference to a source-type wiki page, written in the wiki's
      `link_style` (preferred for sources you've updated via `wiki-update`)
-   - `raw/<file>` or `assets/<file>` — a path to a local file (for drive-by
-     citations where a synthesis page isn't worth creating)
+   - A source path link to a local file, e.g.
+     `[[scaling-laws.pdf](../../raw/scaling-laws.pdf)]` — for drive-by citations
+     where a synthesis page isn't worth creating. The path follows the relative-path
+     rule and must resolve to an existing file.
    - `<URL>` — a live URL, tweet, or ephemeral source (no local copy required)
 
    Never cite entity, concept, or analysis pages — those are syntheses, not sources.
@@ -232,9 +261,11 @@ Three rules for every footnote:
 
 **Drive-by citation examples:**
 ```
-[^3]: raw/scaling-laws.pdf p.7 — "loss scales as a power law in compute"
+[^3]: [[scaling-laws.pdf](../../raw/scaling-laws.pdf)] p.7 — "loss scales as a power law in compute"
 [^4]: https://twitter.com/user/status/123 (2026-04-15) — "<tweet text>"
 ```
+
+(A bare `raw/<file>` in a footnote is stale style; it must be a source path link.)
 
 ## Cross-Model Review
 
@@ -326,6 +357,8 @@ from page frontmatter by `okf`:
 - Pages whose filename matches `audit-*.md` are excluded (gitignored local-only
   artifacts). A page with an unrecognized or missing `type` lands in an
   `Uncategorized` section.
+- The index contains **slug references only** — it is the one wiki document exempt
+  from the source-path-linking rule and must never contain source path links.
 
 ## Index Categories
 Categories: Sources | People | Places | Entities | Concepts | Analyses | Modules | APIs | Decisions | Flows
@@ -346,6 +379,12 @@ doesn't conform to OKF.
 The overview file contains the map of the source materials in this repo, allowing an agent or human
 user to find their way around the repo efficiently. It serves as an entry point into the wiki, and
 through it's links, direct or indirect, all other wiki pages should be reachable. 
+
+Because it is the repo map, the overview links **both ways**: to wiki pages (slug references) and
+to the source material itself (source path links). Every source file or directory the overview
+names — `CONTEXT.md`, `docs/agents/`, `src/`, a build file, an asset — must appear as a source
+path link relative to `wiki/overview.md` (`../CONTEXT.md`, `../docs/agents/`, …), not as a bare
+backticked path.
 
 It is normally produced or updated when the wiki-update skill is run, but the user may directly
 request it to be updated or rebuilt. 
@@ -384,6 +423,8 @@ detail.
 - overview.md reflects the current synthesis across all sources
 - Cross-reference and citation slug-targets follow conventions specified in wiki/SCHEMA.md .
   every skill reads it before writing or scanning links
+- Source material is linked, not just named: every mention of a source file, directory, or
+  image in a wiki doc is a source path link (index.md excepted); see Wiki Link Style
 - contradiction check: update gates on blocking contradictions in touched pages via a transient 
   `contradiction-check: failed` flag, removed before commit — committed pages are always clean (see 
   Contradiction Check)

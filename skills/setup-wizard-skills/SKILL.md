@@ -90,5 +90,5 @@ Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-e
 
 ### 5. Done
 
-Tell the user the setup is complete and that they should not need to run this skill again on this repo.
+Tell the user: "Run this skill again if there is a change in the wizard-skills repo".
 
