@@ -4,10 +4,10 @@ description: Use after source material in this repo has changed. This will updat
 disable-model-invocation: true
 ---
 
-# Wizard Wiki Update
+# Wiki Update
 
 Ingests any new source material into the wiki. Read it, then write a summary 
-page, update entity/concept pages, and maintain the index and overview.
+page, update wiki pages, and maintain the index and overview.
 
 ## Process
 
@@ -24,25 +24,23 @@ If: the wiki/last_update.yml file exists
 Then: 
   - read the file, grab the value of commit_hash from it
   - figure out the hash of the commit that FOLLOWED this commit_hash
-  - do a show-files-only diff between the HEAD of the current branch and that commit hash to get a list 
-    of files changed since the wiki update was last run.
-
+  - do a show-files-only diff between the HEAD of the current branch and that commit hash to get a
+    list of files changed since the wiki update was last run.
 Else: 
   the list of files changed is all source files in the repo (includes all files outside of the 
   /wiki folder). 
 
-Exclude from this list .gitignore, AGENTS.md, and everything that matches the .gitignore file.
+Exclude from this list .gitignore, AGENTS.md, and everything that matches whats in the .gitignore
+file.
 
 If: a raw/ folder exists at the top of this repo
-Then: exclude from the update list all files NOT in raw/
+Then: exclude from the update list all files/folders NOT in raw/
 
 Each of these files in the list is called a source material file.
 
 If: There are more than 3 files in the list
-Then: Process each file in a subagent, following the user specified limits for max subagents. 
+Then: Process each file in a subagent. 
 Else: Process each file sequentially.
-
-For each of those files, apply all of these steps:
 
 ### 2. Read the source in full
 

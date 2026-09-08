@@ -119,10 +119,9 @@ slug reference must follow the `## Emit` rule from `SCHEMA.md`:
 type: Maintenance
 title: Lint Report <today>
 description: <N> errors, <N> warnings, <N> info
-status: orphan
 tags: [lint, maintenance]
-generated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
-updated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
+generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
 ---
 
 # Lint Report — <today>

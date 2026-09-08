@@ -10,6 +10,8 @@ outside of this folder do not need to conform to OKF.
 All wiki pages strictly follow Google's Open Knowledge Format. It must follow valid YAML 
 formatting. There are two types of wiki pages: resource pages, and concept pages. 
 
+All dates and times must follow ISO 8601 format according to the OKF standard. 
+
 ### Wiki Resource Page
 
 A resource page directly describes a file from the source material of this repo. 
@@ -22,8 +24,8 @@ resource: <repo relative path to source material file>
 title: <Source Title>
 description: <one-line description of the source file>
 tags: [<relevant tags>]
-generated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
-updated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
+generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
 ---
 
 # <Source Title>
@@ -59,8 +61,8 @@ type: <Category based on the concept>
 title: <Entity or Concept Name>
 description: <one-line description for the index>
 tags: [entity | concept]
-generated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
-updated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
+generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
 sources:
   <add a yaml list item with a `resource:` key for each source used in this doc, the value is the repo relative path to the source file>
 ---
@@ -84,10 +86,20 @@ sources:
 
 This section defines how cross-references and citation targets are written and parsed for wikis.
 
-Two terms, two kinds of link target:
+Two terms:
 
-- **slug** — the identity of a wiki page: `wiki/pages/<slug>.md`. A *slug reference* is a link to a wiki page.
-- **source path** — a repo-relative path to source material outside `wiki/` — any file or directory: code, docs, data, images, anything (e.g. `CONTEXT.md`, `docs/agents/`, `build.gradle`, `assets/diagram.png`). A *source path link* is a link pointing at one directly.
+- **slug** — the identity of a wiki page: `wiki/pages/<slug>.md`. A *slug reference* is a link to a
+  wiki page.
+- **source path** — a repo-relative path to source material outside `wiki/` — any file or directory:
+  code, docs, data, images, anything (e.g. `CONTEXT.md`, `docs/agents/`, `build.gradle`,
+  `assets/diagram.png`). A *source path link* is a link pointing at one directly.
+
+## Wiki Link Targets
+
+Three kinds of link targets:
+- slug
+- source path
+- URL
 
 Every wiki document — including the special `wiki/overview.md` — may link to wiki pages and to 
 source material, and is **expected to do both**: any mention of source material in prose, in a 
