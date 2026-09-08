@@ -13,7 +13,7 @@ You must strictly use the following template. Don't add anything to the frontmat
 ```markdown
 ---
 type: Sources
-resource: <absolute path to source material file, relative to the root of this repo>
+resource: <repo relative path to source material file>
 title: <Source Title>
 description: <one-line description of the source file>
 tags: [<relevant tags>]
@@ -57,7 +57,7 @@ tags: [entity | concept]
 generated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
 updated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
 sources:
-  <add a yaml list item with a `resource:` key for each source used in this doc, the value is the absolute path to the source file relative to the root of this repo>
+  <add a yaml list item with a `resource:` key for each source used in this doc, the value is the repo relative path to the source file>
 ---
 
 # <Name>
@@ -100,21 +100,27 @@ not to the wiki root. Since all slug pages live flat in `wiki/pages/`:
   - `- [[helaman](pages/helaman.md)] — the record of the priests`
   - Citation footnote: `[^1]: [[helaman](pages/helaman.md)] §3.2 — "..."`
 
-Do not prefix with `wiki/` or `./pages/` from inside `pages/`, and do not use absolute-looking paths such as `/wiki/pages/<slug>.md` — GitHub resolves those against the repository root, which breaks when the repo is viewed in a subdirectory or rendered by non-GitHub tools.
+Do not prefix with `wiki/` or `./pages/` from inside `pages/`, and do not use absolute-looking 
+paths such as `/wiki/pages/<slug>.md` — GitHub resolves those against the repository root, which 
+breaks when the repo is viewed in a subdirectory or rendered by non-GitHub tools.
 
-Quick check before writing a link: *"From the file I'm editing, does this path reach the target file?"* Open the target from the link and verify it exists.
+Quick check before writing a link: *"From the file I'm editing, does this path reach the target 
+file?"* Open the target from the link and verify it exists.
 
-Drive-by citations (paths outside of `wiki/`, and bare URLs) are unchanged by link style — they are not slug references.
+Drive-by citations (paths outside of `wiki/`, and bare URLs) are unchanged by link style — they are 
+not slug references.
 
 ### Parse
 
 To find slug references in any wiki page, match either pattern (a wiki may legitimately contain both forms if a user has hand-edited content or imported pages):
 
 ```
-\[\[([a-z0-9-]+)\]\((?:/wiki/pages/)?\1\.md\)\]             (markdown form, pages/ prefix optional)
+\[\[([a-z0-9-]+)\]\([^)]*\1\.md\)\]
 ```
 
-The `/wiki/pages/` prefix is optional in the parse because it is correct for pages outside `wiki/pages/` but must be absent for pages inside `wiki/pages/`. The captured group is the slug; resolve to `wiki/pages/<slug>.md`.
+The `wiki/pages/` prefix is optional in the parse because it is correct for pages outside 
+`wiki/pages/` but must be absent for pages inside `wiki/pages/`. The captured group is the slug; 
+resolve to `wiki/pages/<slug>.md`.
 
 Reading is permissive; writing is strict.
 
@@ -261,28 +267,8 @@ commits. It is a **gate, not an annotation**: every page that lands in git is cl
 
 This flag is also what the **Pre-commit Gate** below scans staged files for.
 
-## Pre-commit Gate
-
-On a git wiki, `bin/hooks/pre-commit` (installed by `wiki-init` via
-`git config core.hooksPath bin/hooks`) runs **two** deterministic gates before every commit —
-no LLM:
-
-1. **`bin/check-contradictions.py`** — scans the **staged** content of `wiki/pages/*.md`,
-   frontmatter only, and **blocks the commit** if any page still carries a
-   `contradiction-check: failed` flag. Backstop to the skill-level hold in `wiki-update`
-   step 7b; on a healthy wiki it never fires. Resolve the contradiction and remove the
-   `contradiction-check:` line, then re-stage.
-2. **`bin/lint-mechanical.py --staged`** — scans the staged pages for **structural**
-   problems and **blocks the commit** on any: missing required frontmatter, a broken
-   `[[link]]`, or a slug collision (a bare slug clashing with a qualified one). Fix the page
-   and re-stage.
-
-- **Fresh clone:** `core.hooksPath` is repo-local config and is not cloned — re-run
-  `git config core.hooksPath bin/hooks` once after cloning.
-- **Override** an intentional commit with `git commit --no-verify`.
-
 ## Operation Log & Commit Convention
-Operations: init, update, query, update, lint, audit, merge, split
+Operations: init, update, query, lint, audit, merge, split
 
 **The git history is the operation log.** After an operation, the skill
 suggests a commit message and commits on your confirmation (skills never auto-commit).
@@ -297,7 +283,6 @@ The suggested subject line follows the repo's commit convention:
    | Operation        | Type                                  |
    |------------------|---------------------------------------|
    | init             | `chore`                               |
-   | update           | `docs`                                |
    | update           | `docs`                                |
    | query (saved)    | `docs`                                |
    | lint             | `fix` if fixes applied, else `chore`  |
@@ -318,8 +303,8 @@ Wiki-Op: update
 from page frontmatter by `okf`:
 - Run `okf index wiki/pages` **after** any operation that adds, removes, renames, or re-categorizes a page.
 - The generator groups pages by their Cateogry (stored in `type` in frontmatter), in the order categories are
-  listed under **Index Categories** below; within a type it lists pages newest-first
-  by `created`. Each entry is `- [[slug]] — summary _(created)_`.
+  listed under **Index Categories** below; within a type it lists pages alphabetically
+  Each entry is `- [[slug]] — description _(generated.at)_`.
   If a Category has no pages, then that Category won't be shown in the index.
 - Pages whose filename matches `audit-*.md` are excluded (gitignored local-only
   artifacts). A page with an unrecognized or missing `type` lands in an
@@ -340,7 +325,7 @@ Note that the Category is written into the `type` field of frontmatter.
 - wikis are expected to be git repositories
 - operation log: git wikis record each op as a commit (see Operation Log & Commit Convention) and render it with bin/render-log.py
 - index.md is GENERATED by okf and is saved in the repo to make it easier to browse — 
-  never hand-edit it; set page frontmatter (type, summary) and regenerate instead
+  never hand-edit it; set page frontmatter (type, description) and regenerate instead
 - All pages live flat in wiki/pages/ — no subdirectories
 - overview.md reflects the current synthesis across all sources
 - Cross-reference and citation slug-targets follow conventions specified in wiki/SCHEMA.md .
@@ -348,9 +333,6 @@ Note that the Category is written into the `type` field of frontmatter.
 - contradiction check: update gates on blocking contradictions in touched pages via a transient 
   `contradiction-check: failed` flag, removed before commit — committed pages are always clean (see 
   Contradiction Check)
-- pre-commit gate: git wikis run bin/hooks/pre-commit (via core.hooksPath) → 
-  bin/check-contradictions.py, which blocks any commit staging a page that still carries the flag 
-  (see Pre-commit Gate); re-run `git config core.hooksPath bin/hooks` after a fresh clone
 
 # Wiki Tools
 
