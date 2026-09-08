@@ -76,6 +76,7 @@ Create these directories at the repo root if they don't exist:
 - wiki/bin
 - wiki/config
 - wiki/pages
+- wiki/reports
 
 **Critical:** `wiki/pages/` is flat. All pages live here as `<slug>.md`. No subdirectories. Slugs are lowercase, hyphen-separated.
 

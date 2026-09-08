@@ -33,6 +33,9 @@ Else:
 
 Exclude from this list .gitignore, AGENTS.md, and everything that matches the .gitignore file.
 
+If: a raw/ folder exists at the top of this repo
+Then: exclude from the update list all files NOT in raw/
+
 Each of these files in the list is called a source material file.
 
 If: There are more than 3 files in the list

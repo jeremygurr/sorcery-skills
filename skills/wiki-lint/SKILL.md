@@ -109,7 +109,7 @@ accepted limit of tag-cluster scoping; Phase 2 (graph/string checks) still cover
 First, the one body-level check that needs no page bodies: read `wiki/overview.md` and flag
 **🔵 Coverage gaps** — open questions that a web search or a new ingest could answer.
 
-Then write `wiki/pages/lint-<today>.md` (do not ask permission — always write this), merging
+Then write `wiki/reports/lint-<today>.md` (do not ask permission — always write this), merging
 Phase 2 findings, the deduped Phase 3 findings, and the coverage gaps. The template below
 shows slug references in obsidian form for readability; in the actual report you write, every
 slug reference must follow the `## Emit` rule from `SCHEMA.md`:
@@ -119,6 +119,7 @@ slug reference must follow the `## Emit` rule from `SCHEMA.md`:
 type: Maintenance
 title: Lint Report <today>
 description: <N> errors, <N> warnings, <N> info
+status: orphan
 tags: [lint, maintenance]
 generated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
 updated: { by: <current agent or harness name>/<current model>, at: <current time in ISO 8601 datetime format> }
@@ -183,9 +184,6 @@ updated: { by: <current agent or harness name>/<current model>, at: <current tim
 - [[page]] [^3] cites text source [[markdown-source]] with no line-range
   Fix: add an `L<start>-<end>` token so wiki-audit can verify it deterministically
 ```
-
-The lint report carries `type: Maintenance` in its frontmatter, so it lands in the index
-automatically — do not hand-edit `index.md`.
 
 ### Offer concrete fixes
 
