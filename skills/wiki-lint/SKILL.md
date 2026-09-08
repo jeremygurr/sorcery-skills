@@ -6,7 +6,7 @@ description: Use when auditing a wiki for health issues — contradictions betwe
 # Wiki Lint
 
 Audit the wiki as a four-phase pipeline that keeps page bodies out of the main context: a
-deterministic script (Phase 1) and per-cluster subagents (Phase 2) do the heavy reading; the
+deterministic script (Phase 2) and per-cluster subagents (Phase 3) do the heavy reading; the
 main thread only assembles findings. Produce a categorized report, offer concrete fixes, log
 the operation.
 
@@ -16,16 +16,16 @@ If: wiki/SCHEMA.md doesn't exist
 Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
 Else: read the wiki/SCHEMA.md file if it hasn't been read already. 
 
-- **Phase 1** runs `bin/lint-mechanical.py`, which computes the deterministic checks (graph
+- **Phase 2** runs `bin/lint-mechanical.py`, which computes the deterministic checks (graph
   and string properties) with **no LLM and no bodies in your context**, and emits the
-  tag-cluster list for Phase 2.
-- **Phase 2** dispatches one subagent per tag cluster. Each reads only its cluster's pages
+  tag-cluster list for Phase 3.
+- **Phase 3** dispatches one subagent per tag cluster. Each reads only its cluster's pages
   (bodies live in the *subagent's* context, discarded on return) and reports the cross-page
   and body-level findings. You aggregate compact findings, never bodies.
 
-Phase 1 checks are whole-wiki exhaustive. Phase 2 checks are **cluster-scoped**: a page that
+Phase 2 checks are whole-wiki exhaustive. Phase 3 checks are **cluster-scoped**: a page that
 shares no tag with any other page is not body-checked (approach A's accepted recall limit —
-see *Phase 2*). Run lint periodically (every 5–10 ingests) so the scoped passes accumulate
+see *Phase 3*). Run lint periodically (every 5–10 ingests) so the scoped passes accumulate
 coverage.
 
 ## Process
@@ -36,7 +36,15 @@ coverage.
 okf index wiki/pages
 ```
 
-### Phase 1 — deterministic checks (script, no LLM)
+### Phase 1 — use the okf lint
+
+```
+okf lint wiki/pages
+```
+
+Correct any problems it finds. 
+
+### Phase 2 — deterministic checks (script, no LLM)
 
 Run `python wiki/bin/lint-mechanical.py` and parse its JSON. It returns:
 
@@ -62,9 +70,9 @@ These map to report sections directly:
 
 Do **not** re-derive these by reading pages yourself — the script is the source of truth.
 
-### Phase 2 — cluster subagents (contradictions + body-level checks)
+### Phase 3 — cluster subagents (contradictions + body-level checks)
 
-For each cluster in the Phase 1 `clusters` list, dispatch a subagent (parallel fan-out,
+For each cluster in the Phase 2 `clusters` list, dispatch a subagent (parallel fan-out,
 limited by concurrency limits specified in AGENTS.md). Give it the cluster's page paths and this instruction:
 
 > Read these pages. Report, **within these pages only**, as a compact list — each finding as
@@ -88,15 +96,15 @@ finding can surface more than once.
 
 **Coverage note:** because subagents only see their cluster, body-level findings are
 cluster-scoped. Pages sharing no tag with any other page are not body-checked. This is the
-accepted limit of tag-cluster scoping; Phase 1 (graph/string checks) still covers every page.
+accepted limit of tag-cluster scoping; Phase 2 (graph/string checks) still covers every page.
 
-### Phase 3 — coverage gaps, then assemble the report
+### Phase 5 — coverage gaps, then assemble the report
 
 First, the one body-level check that needs no page bodies: read `wiki/overview.md` and flag
 **🔵 Coverage gaps** — open questions that a web search or a new ingest could answer.
 
 Then write `wiki/pages/lint-<today>.md` (do not ask permission — always write this), merging
-Phase 1 findings, the deduped Phase 2 findings, and the coverage gaps. The template below
+Phase 2 findings, the deduped Phase 3 findings, and the coverage gaps. The template below
 shows slug references in obsidian form for readability; in the actual report you write, every
 slug reference must follow the `## Emit` rule from `SCHEMA.md`:
 
@@ -116,7 +124,7 @@ updated: { by: <current agent or harness name>/<current model>, at: <current tim
 - 🔴 Errors: N
 - 🟡 Warnings: N
 - 🔵 Info: N
-<!-- note here if any cluster was split (Phase 1 `split: true`): contradiction recall is
+<!-- note here if any cluster was split (Phase 2 `split: true`): contradiction recall is
      reduced for those pages — they were too large a tag group to check together -->
 
 ## 🔴 Broken Links
