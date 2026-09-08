@@ -43,7 +43,7 @@ REQUIRED_FIELDS = ("type", "title", "description", "tags", "generated", "updated
 # The markdown path is whatever the emitting page needs to reach the target
 # (relative from inside pages/, or prefixed from outside) — only the [[...]] slug
 # is captured; known-slug validation happens in the link checks below.
-LINK_RE = re.compile(r"\[\[([^\]|]+?)(?:\|[^\]]*)?\](?:\([^)]*\.md\))?\]")
+LINK_RE = re.compile(r"\[\[([a-z0-9-]+)\]\([^)]*\1\.md\)\]")
 STALE_MARKERS = ("current", "latest", "recent", "state-of-the-art")
 YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")
 STALE_AGE_DAYS = 90

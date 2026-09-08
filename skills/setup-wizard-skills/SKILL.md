@@ -80,8 +80,8 @@ Create these directories at the repo root if they don't exist:
 
 ### 3. Copy assets
 
-copy this skill's `assets/SCHEMA.md` to `<repo-root>/wiki/SCHEMA.md`.
-copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`.
+Copy this skill's `assets/SCHEMA.md` to `<repo-root>/wiki/SCHEMA.md`, replacing any pre-existing files.
+Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-existing files.
 
 ### 4. Commit and push
 
