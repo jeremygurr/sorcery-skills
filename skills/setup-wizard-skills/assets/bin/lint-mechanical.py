@@ -31,6 +31,8 @@ def _find_repo_root():
 
 WIKI_ROOT = _find_repo_root()
 PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
+CONFIG_DIR = WIKI_ROOT / "wiki" / "config"
+FAMILIES_FILE = CONFIG_DIR / "slug-families.txt"
 
 # Required per-page fields per wiki/SCHEMA.md page templates (both resource and
 # concept pages carry these; `resource`/`sources` are type-specific and checked by
@@ -156,15 +158,51 @@ def check_orphans(pages):
     return [{"page": slug} for slug, n in inbound.items() if n == 0]
 
 
-def check_slug_collisions(pages):
-    """Flag a bare single-token slug colliding with qualified slugs sharing its lead token."""
+def slug_families():
+    """Declared intentional slug families: a list of sets of slugs.
+
+    Reads wiki/config/slug-families.txt — one family per line, space-separated
+    slugs, '#' starts a comment. A family declares that its slugs are related
+    pages (a glossary term beside the class/concept derived from it, a source
+    page beside its test or sibling), NOT homonym collisions of different
+    senses. A missing or empty file means no declared families.
+    """
+    families = []
+    if not FAMILIES_FILE.exists():
+        return families
+    for line in FAMILIES_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        members = set(line.split())
+        if members:
+            families.append(members)
+    return families
+
+
+def is_declared_family(group, families):
+    """True if the whole collision group sits inside a single declared family."""
+    return any(fam.issuperset(group) for fam in families)
+
+
+def check_slug_collisions(pages, families=None):
+    """Flag a bare single-token slug colliding with qualified slugs sharing its lead token.
+
+    Groups that form a declared slug family (see slug_families) are intended
+    relatives, not collisions, and are skipped.
+    """
+    families = families or []
     out = []
     for slug in pages:
         if "-" in slug:
             continue  # only bare slugs are ambiguous
         qualified = sorted(s for s in pages if s != slug and s.split("-")[0] == slug)
-        if qualified:
-            out.append({"token": slug, "pages": [slug] + qualified})
+        if not qualified:
+            continue
+        group = {slug, *qualified}
+        if is_declared_family(group, families):
+            continue
+        out.append({"token": slug, "pages": [slug] + qualified})
     return out
 
 
@@ -232,7 +270,7 @@ def run_full(today=None, cluster_cap=None):
         "missing_frontmatter": check_missing_frontmatter(pages),
         "broken_links": check_broken_links(pages),
         "orphans": check_orphans(pages),
-        "slug_collisions": check_slug_collisions(pages),
+        "slug_collisions": check_slug_collisions(pages, slug_families()),
         "stale_date": check_stale_date(pages, today),
         "missing_concept": check_missing_concept(pages),
     }
@@ -264,14 +302,25 @@ def known_slugs():
     return {p.stem for p in PAGES_DIR.glob("*.md") if is_page(p)}
 
 
-def collision_for(slug, known):
-    """Return the colliding slug group if `slug` collides with a known slug, else None."""
+def collision_for(slug, known, families=None):
+    """Return the colliding slug group if `slug` collides with a known slug, else None.
+
+    Declared slug families (see slug_families) are intended relatives, not
+    collisions, so a group inside one is not a collision.
+    """
+    families = families or []
     others = known - {slug}
     if "-" not in slug:  # bare slug vs qualified slugs sharing it
         partners = sorted(s for s in others if s.split("-")[0] == slug)
-        return [slug] + partners if partners else None
+        if not partners:
+            return None
+        group = {slug, *partners}
+        return None if is_declared_family(group, families) else [slug] + partners
     base = slug.split("-")[0]  # qualified slug vs an existing bare base
-    return sorted([base, slug]) if base in others else None
+    if base not in others:
+        return None
+    group = {base, slug}
+    return None if is_declared_family(group, families) else sorted([base, slug])
 
 
 def run_staged():
@@ -280,6 +329,7 @@ def run_staged():
     except RuntimeError:
         return 0  # not a git repo — nothing to gate
     known = known_slugs()
+    families = slug_families()
     problems = []
     for path in staged_page_paths():
         slug = Path(path).stem
@@ -293,7 +343,7 @@ def run_staged():
         for target in links_in(body):
             if target not in known:
                 problems.append((slug, f"broken link: [[{target}]]"))
-        collision = collision_for(slug, known)
+        collision = collision_for(slug, known, families)
         if collision:
             problems.append((slug, f"slug collision: {', '.join(collision)}"))
 

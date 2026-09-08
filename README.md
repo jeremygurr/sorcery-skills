@@ -62,6 +62,11 @@ pi
 /skill:setup-wizard-skills
 ```
 
+This can be run multiple times safely, and it will replace the created files each time. This is 
+important if you want to update the repo, because some files are copied from the skill into the 
+repo itself. So to cleanly update the wizard-skills repo, do a pull there, then go to pi in your 
+project repo, and run the setup skill again, and it will take care of the rest. 
+
 ## 6. Follow the instructions of the setup skill
 
 ## 7. Understand how it works. 
