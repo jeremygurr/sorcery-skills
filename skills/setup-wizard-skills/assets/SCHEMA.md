@@ -1,5 +1,10 @@
 # Wiki Schema
 
+## Googles Open Knwoledge Format
+
+The wiki conforms to the Open Knowledge Format (OKF), and the bundle is at wiki/pages. The files
+outside of this folder do not need to conform to OKF. 
+
 ## Wiki Page Templates
 
 All wiki pages strictly follow Google's Open Knowledge Format. It must follow valid YAML 
@@ -361,7 +366,7 @@ from page frontmatter by `okf`:
   from the source-path-linking rule and must never contain source path links.
 
 ## Index Categories
-Categories: Sources | People | Places | Entities | Concepts | Analyses | Modules | APIs | Decisions | Flows
+Categories: Sources | People | Places | Events | Entities | Concepts | Analyses | Modules | APIs | Decisions | Flows
 
 Not all categories need to be used. A codebase will use categories like Sources, Modules, APIs, Decisions, 
 and Flows. A general purpose document or research repo may use Sources, Entities, Concepts, 

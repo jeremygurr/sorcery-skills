@@ -58,10 +58,11 @@ Parsing references in wiki pages rule) if they point to pages that seem relevant
 Write a response that is grounded in the wiki pages you read.
 ```
 
-In the same way, add/replace the following block in the AGENTS.md file:
+Also add this block to the AGENTS.md file, but only if the Subagent Settings
+section is not already there:
 
 ```markdown
-# Subagent settings
+# Subagent Settings
 
 - Maximum number of subagents at one time is 3. This adjusts max concurrency accordingly. 
 ```
