@@ -145,6 +145,17 @@ works if the link graph is trustworthy, so two rules hold everywhere links are w
    Pick the narrowest discriminator that disambiguates. `wiki-lint` warns when slugs
    sharing a base token look like an unintended collision.
 
+   **Related slugs are not homonyms.** A bare slug beside its qualified relatives can be
+   genuinely related pages rather than different senses — a glossary term and the class or
+   concept derived from it (`row` / `row-clear`, `skin` / `skin-effect`), or a source page
+   and its test or sibling (`piece` / `piece-shape`, `gradle` / `gradle-wrapper`). When that
+   is the case, declare the whole group as one family in `wiki/config/slug-families.txt`
+   (one space-separated line per family, `#` for comments); the mechanical lint and the
+   pre-commit gate then treat a collision group fully contained in a declared family as
+   intended relatives and skip it. A group that is only partly declared, or a new relative
+   not yet added to its family line, is still flagged — extend the family file when you add
+   a member.
+
 Consolidating two pages that turn out to be the same concept (merge), or separating one
 overloaded page into qualified pages (split), is the job of the `wiki-merge` skill.
 
