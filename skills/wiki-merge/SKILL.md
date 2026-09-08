@@ -15,9 +15,9 @@ no link is left resolving to nothing.
 
 ## Pre-condition
 
-Find `SCHEMA.md` (search from cwd upward, or `~/wikis/`). If not found, tell the user to
-run `wiki-init` first. Read it to get the wiki root path and the Concept Identity
-convention.
+If: wiki/SCHEMA.md doesn't exist
+Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
+Else: read the wiki/SCHEMA.md file if it hasn't been read already. 
 
 ## Choose the operation
 
@@ -56,8 +56,8 @@ Show the proposed survivor page as a diff and confirm before writing.
 
 ### 3. Rewrite all inbound links
 
-Grep every page in `wiki/pages/` and `overview.md` for `[[<loser-slug>]]` (skip
-`index.md` — it is generated and will be rebuilt). Rewrite each to `[[<survivor-slug>]]`.
+Grep every page in `wiki/pages/` and `wiki/overview.md` for `[<loser-slug>]` (skip
+`index.md` — it is generated and will be rebuilt). Rewrite each to `[<survivor-slug>]`.
 Watch for:
 - A page that linked to *both* — collapse to a single link, fix surrounding prose.
 - Link text/aliases that named the loser — update the wording to read naturally.
@@ -68,12 +68,12 @@ Show the list of affected pages and the edits; confirm before writing.
 
 Remove `wiki/pages/<loser-slug>.md`. Do not touch `index.md` by hand — regenerate it so
 the loser's entry disappears and the survivor's reflects its merged frontmatter:
-`python bin/generate-index.py`.
+`okf index wiki/pages`.
 
 ### 5. Link-resolution sweep
 
-Grep the whole wiki for `[[<loser-slug>]]` — there must be **zero** matches left. Then
-confirm every `[[slug]]` on the survivor page resolves to a real page. Fix any stragglers
+Grep the whole wiki for `[<loser-slug>]` — there must be **zero** matches left. Then
+confirm every `[slug]` on the survivor page resolves to a real page. Fix any stragglers
 before finishing. (This is the same inline check `wiki-ingest` runs; a merge that leaves a
 dangling link defeats its own purpose.)
 
@@ -89,11 +89,6 @@ Convention**:
 
   Wiki-Op: merge
   ```
-- **Non-git wiki:** append to `wiki/log.md`:
-  ```
-  ## [<today>] merge | <loser-slug> → <survivor-slug>
-  Inbound links rewritten: <N> across <list of pages>
-  ```
 
 ---
 
@@ -105,9 +100,9 @@ Identify each distinct sense the overloaded page conflates. Propose a qualified 
 sense, following the disambiguation convention in `SCHEMA.md` (narrowest discriminator
 that disambiguates):
 
-> `[[transformer]]` overloads two senses →
-> - `[[transformer-ml]]` — the neural network architecture
-> - `[[transformer-electrical]]` — the power-grid device
+> `[transformer]` overloads two senses →
+> - `[transformer-ml]` — the neural network architecture
+> - `[transformer-electrical]` — the power-grid device
 
 Decide what happens to the original bare slug:
 - **Retire it** (most common): both senses move to qualified slugs; the bare slug is
@@ -126,7 +121,7 @@ sequentially. Show each new page and confirm before writing.
 
 ### 3. Repoint inbound links per sense
 
-Grep every page in `wiki/pages/` and `overview.md` for `[[<original-slug>]]` (skip the
+Grep every page in `wiki/pages/` and `wiki/overview.md` for `[<original-slug>]` (skip the
 generated `index.md`). For **each** occurrence, decide which sense it meant from its
 context and rewrite it to the correct qualified slug. This is the judgment-heavy step —
 do not blanket-replace. When a single page referenced both senses, split it into two links.
@@ -139,12 +134,12 @@ before writing.
 If retiring the bare slug, delete `wiki/pages/<original-slug>.md`. If keeping it as the
 primary sense, trim it to that sense only and bump its `updated` date. Then regenerate the
 index so the removed/added pages are reflected — do not hand-edit `index.md`:
-`python bin/generate-index.py`.
+`okf index wiki/pages`.
 
 ### 5. Link-resolution sweep
 
-If the bare slug was retired, grep the whole wiki for `[[<original-slug>]]` — zero matches
-must remain. Confirm every `[[slug]]` on the new pages resolves. Fix any stragglers.
+If the bare slug was retired, grep the whole wiki for `[<original-slug>]` — zero matches
+must remain. Confirm every `[slug]` on the new pages resolves. Fix any stragglers.
 
 ### 6. Update overview and record the operation
 
@@ -156,11 +151,6 @@ per SCHEMA's **Operation Log & Commit Convention**:
   refactor: split <original-slug> into <slug-a>, <slug-b>
 
   Wiki-Op: split
-  ```
-- **Non-git wiki:** append to `wiki/log.md`:
-  ```
-  ## [<today>] split | <original-slug> → <slug-a>, <slug-b>
-  Inbound links repointed: <N> across <list of pages>
   ```
 
 ---
@@ -176,4 +166,4 @@ per SCHEMA's **Operation Log & Commit Convention**:
 - **Merging without confirmation** — Merge deletes a page and rewrites links across the
   wiki. Always show the plan and the diffs, and write only after the user confirms.
 - **Skipping the log** — Record the operation so the slug change is traceable: a git wiki
-  commits it (with the `Wiki-Op:` trailer); a non-git wiki appends to `log.md`.
+  commits it (with the `Wiki-Op:` trailer).md`.
