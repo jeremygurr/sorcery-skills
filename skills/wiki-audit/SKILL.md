@@ -63,7 +63,7 @@ claim becomes a Phase A finding. Still run Phase A; skip Phase B.
 
 Dispatch one subagent. Give it:
 - The full page contents.
-- The **Citations** section copied from `SCHEMA.md`.
+- Everything in `SCHEMA.md`.
 - The page's `sources:` list.
 
 Task: list every non-common-knowledge factual claim that lacks a footnote. Return a structured list

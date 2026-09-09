@@ -9,15 +9,15 @@ disable-model-invocation: true
 Ingests any new source material into the wiki. Read it, then write a summary 
 page, update wiki pages, and maintain the index and overview.
 
-## Process
+The steps from the sections below must be executed like this:
+- Controller Pre-Processing Steps (controller agent)
+- Source Page Processing Steps (worker agents if processing in parallel, controller agent if processing
+  sequentially)
+- Controller Post-Processing Steps (controller agent)
 
-### 0. Load the SCHEMA
+The controller agent refers to the current agent. Worker agents may be spawned later as instructed.
 
-If: wiki/SCHEMA.md doesn't exist
-Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
-Else: read the wiki/SCHEMA.md file if it hasn't been read already. 
-
-### 1. Get list of files that have changed
+## Controller Pre-Processing Steps
 
 We need a list of files that changed (added, modified, moved, or deleted) since the last wiki update.
 
@@ -40,9 +40,21 @@ Then: exclude from the update list all files/folders NOT in raw/
 Each of these files in the list is called a source material file and represents a file that has been
 changed, either created, modified, or deleted.
 
+Run the Source Page Processing Steps below for each file. 
+
 If: There are more than 3 files in the list
-Then: Process each file in a subagent. 
-Else: Process each file sequentially.
+Then: Process each file in a worker subagent. 
+Else: Process each file sequentially in the controller agent.
+
+## Source Page Processing Steps
+
+### 1. Load the SCHEMA
+
+Do this if the wiki/SCHEMA.md file hasn't already been read:
+
+If: wiki/SCHEMA.md doesn't exist
+Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
+Else: read the wiki/SCHEMA.md file.
 
 ### 2. Read the source in full
 
@@ -58,15 +70,17 @@ Example: "Attention Is All You Need" → `attention-is-all-you-need`
 If this file was deleted:
 - Delete the corrosponding wiki page if it exists.
 - Search for any references or links to this page, and remove those also. 
-- Skip ahead to step 11, since the other steps only apply to source files that still exist.
+- Skip the remaining Source Paeg Processing steps for this file, since the other steps only apply to
+  source files that still exist.
 
 ### 5. Update references if moved
 
 If this file was moved:
 - Update the corrosponding wiki page if it exists.
 - Search for any references or links to this page, and update those to point to the new location. 
-- If there are no modifications to the source file itself, skip ahead to step 11, since the other
-  steps only apply to source files that had their content changed.
+- If there are no modifications to the source file itself, skip the remaining Source Page Processing
+  Steps for this file, since the other steps only apply to source files that had their content
+  changed.
 
 ### 6. Write/Update the source summary page
 
@@ -161,17 +175,16 @@ entity/concept pages, backlinks), collect all `[[slug]]` references across *thos
 confirm each resolves to an existing `wiki/pages/<slug>.md`. Fix any unresolved link before moving 
 on — remove it or create its page.
 
-### 9. Contradiction check — do not skip
+### 11. Contradiction check — do not skip
 
-Now that every page this update touched is written and you have its neighbors in context,
-check for contradictions **before** committing. Read the **Contradiction Check** section in
-`SCHEMA.md` for the full convention. This is a gate, not an annotation: a clean update
-leaves no contradiction metadata on any page.
+Now that every page this update touched is written and you have its neighbors in context, check for
+contradictions. Read the **Contradiction Check** section in `SCHEMA.md` for the full convention.
+This is a gate, not an annotation: a clean update leaves no contradiction metadata on any page.
 
 **Scope — what to compare (do NOT re-read the whole wiki):**
 - each page you wrote/edited against itself (internal contradictions), and
 - each page you wrote/edited against the pages you already read this update — the
-  entity/concept pages from step 9 and the neighbor pages from the step 10 backlink audit.
+  entity/concept pages from earlier and the neighbor pages from the backlink audit.
 
 A conflict with some distant page you never opened is out of scope here — the periodic
 `wiki-lint` sweep is the backstop for that.
@@ -187,7 +200,7 @@ A conflict with some distant page you never opened is out of scope here — the 
    contradiction-check: failed — launch year conflicts with [[that-model]] (2024 vs 2023)
    ```
    Use `internal` in place of the `[[slug]]` for a within-page conflict. Then **stop — do
-   not proceed to the commit step (step 14).** Surface the conflict (both claims, both
+   not proceed to the commit step.** Surface the conflict (both claims, both
    locations) and offer the user these resolutions:
    - correct the newly-written page,
    - correct the counterpart page,
@@ -203,7 +216,11 @@ A conflict with some distant page you never opened is out of scope here — the 
    **not** write anything to any page and do **not** block. Note it for the step 13 summary
    so the user can act if they wish; the periodic `wiki-lint` sweep is the backstop.
 
-### 11. Regenerate `wiki/pages/index.md`
+## Controller Post Processing Steps
+
+These steps are run after all of the Source Page Processing Steps have been completed for all files.
+
+### 1. Regenerate `wiki/pages/index.md`
 
 Do **not** hand-edit the index. Every page you wrote this update already carries the important 
 fields in its frontmatter — that is the index's source of truth. Regenerate it:
@@ -215,27 +232,43 @@ okf index wiki/pages
 If the generator warns about a page with no frontmatter or a page lands in `Uncategorized`, fix 
 that page's frontmatter and rerun.
 
-### 12. Update `wiki/overview.md`
+### 2. Update `wiki/overview.md`
 
 Re-read the current overview (if it exists).
 
 Create or update it as described in the SCHEMA.md doc. 
 
-### 13. Record the operation
+### 3. Record the operation
 
 **Gate first:** do not suggest a commit while any page touched this update still carries a
 `contradiction-check: failed` line (step 11). Resolve the blocking contradiction and remove
 the line first — committed pages are always clean.
 
 Per SCHEMA's **Operation Log & Commit Convention**:
-- **Git wiki:** stage the wiki changes and suggest a commit (subject follows the repo's
-  convention — default Conventional Commits `docs:` for an update — plus the trailer).
-  Commit on the user's confirmation; never auto-commit.
-  ```
-  docs: summarize <source title>
+stage the wiki changes and suggest a commit (subject follows the repo's convention — default
+Conventional Commits `docs:` for an update — plus the trailer).
+```
+docs: summarize <source title>
 
-  Wiki-Op: update
-  ```
+Wiki-Op: update
+```
+
+### 4. Commit
+
+1. Save the most recent commit hash into wiki/last_update.yml. Replace the file if it already exists. Use this template:
+``` yaml
+commit_hash: <hash>
+```
+
+2. Commit the changes to the repo, and push those changes to origin if there is an origin remote configured.
+
+### 5. Report to user
+
+- Summary page: `wiki/pages/<slug>.md`
+- Entity/concept pages created or updated: <list>
+- Pages that received backlinks: <list>
+- Index and overview updated
+- Soft tensions noted (step 11): <list any non-blocking tensions, or "none"> — not recorded on any page; act on them if you want
 
 ## Common Mistakes
 
@@ -251,22 +284,4 @@ Per SCHEMA's **Operation Log & Commit Convention**:
   the existing page set (`ls wiki/pages/`); see the Concept Identity rule in `SCHEMA.md`.
 - **Summarizing the abstract instead of synthesizing** — The Summary section should reflect your 
   own synthesis, not a rephrased abstract.
-
-### 14. Commit
-
-1. Save the most recent commit hash into wiki/last_update.yml. Replace the file if it already exists. Use this template:
-``` yaml
-commit_hash: <hash>
-```
-
-2. Commit the changes to the repo, and push those changes to origin if there is an origin remote configured.
-
-### 15. Report to user
-
-- Summary page: `wiki/pages/<slug>.md`
-- Entity/concept pages created or updated: <list>
-- Pages that received backlinks: <list>
-- Index and overview updated
-- Soft tensions noted (step 11): <list any non-blocking tensions, or "none"> — not recorded on any page; act on them if you want
-
 

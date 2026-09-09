@@ -77,7 +77,8 @@ Do **not** re-derive these by reading pages yourself — the script is the sourc
 ### Phase 3 — cluster subagents (contradictions + body-level checks)
 
 For each cluster in the Phase 2 `clusters` list, dispatch a subagent (parallel fan-out,
-limited by concurrency limits specified in AGENTS.md). Give it the cluster's page paths and this instruction:
+limited by concurrency limits specified in AGENTS.md). Give it the cluster's page paths and this
+instruction:
 
 > Read these pages. Report, **within these pages only**, as a compact list — each finding as
 > `{type, pages:[slug,...], detail}`, or `clean` if none:
