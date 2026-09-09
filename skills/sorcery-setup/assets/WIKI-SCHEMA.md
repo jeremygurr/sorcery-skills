@@ -45,15 +45,17 @@ clickable. The display text depends on the target kind:
 - **Slug reference**: the display text is the slug verbatim.
   - `see [[helaman](helaman.md)] for the account of the wars`
 - **Source path link**: the display text is a short readable name — the basename, a human 
-  name, or the full repo-relative path when that path is already short (e.g. 
-  `docs/README.md`). Source paths in code repos can be very deep; keep the depth in the 
-  link and the display text short and clickable.
+  name, or if the base name is too similar to other files, then add one or more path components
+  (e.g. if there are multiple README's in the project: `testing/docs/README.md`). Source paths in
+  code repos can be very deep; keep the depth in the link and the display text short and clickable.
   - `the glossary [[CONTEXT.md](../../CONTEXT.md)] retires "piece"`
-  - `see [[docs/README.md](../docs/README.md)] for the overview`
+  - `see [[README.md](../docs/README.md)] for the overview`
   - `the seam sits in
-    [[verticle/components/ButterFly.java](../../src/main/java/com/amex/payments/verticle/components/ButterFly.java)]`
-    — long path in the link, shortened path text on the page
+    [[ButterFly.java](../../src/main/java/com/amex/payments/verticle/components/ButterFly.java)]`
+    — long path in the link, no path or shortened path display text (prefer no path if unambiguous)
   - `see [[Genesis 1:35 L34-36, 38-39](../docs/kjv/Genesis-1.txt#L34-36)]` - line range reference
+    put the full set of line ranges in the display text, and only the first range in the link target
+    itself.
 - **URL** [[google.com/coolaistuff](https://google.com/coolaistuff?someparam=somevalue)
 
 
