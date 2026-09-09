@@ -82,12 +82,14 @@ Create these directories at the repo root if they don't exist:
 
 ### 3. Copy assets
 
-Copy this skill's `assets/SCHEMA.md` to `<repo-root>/wiki/SCHEMA.md`, replacing any pre-existing files.
-Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-existing files.
+Copy this skill's `assets/SCHEMA.md` to `<repo-root>/wiki/SCHEMA.md`, replacing any pre-existing
+files. Don't ask for verification, just do it.
+Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-existing files. Don't
+ask for verification, just do it.
 
 ### 4. Commit and push
 
-1. Commit the changes.
+1. Commit the changes. Don't ask for verification.
 2. If a remote named origin exists, push to it.
 
 ### 5. Done
