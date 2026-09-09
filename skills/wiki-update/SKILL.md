@@ -19,7 +19,7 @@ Else: read the wiki/SCHEMA.md file if it hasn't been read already.
 
 ### 1. Get list of files that have changed
 
-We need a list of files that changed (added, modified, or deleted) since the last wiki update.
+We need a list of files that changed (added, modified, moved, or deleted) since the last wiki update.
 
 If: the wiki/last_update.yml file exists
 Then: 
@@ -58,14 +58,22 @@ Example: "Attention Is All You Need" → `attention-is-all-you-need`
 If this file was deleted:
 - Delete the corrosponding wiki page if it exists.
 - Search for any references or links to this page, and remove those also. 
-- Skip ahead to step 10, since the other steps only apply to source files that still exist.
+- Skip ahead to step 11, since the other steps only apply to source files that still exist.
 
-### 5. Write/Update the source summary page
+### 5. Update references if moved
+
+If this file was moved:
+- Update the corrosponding wiki page if it exists.
+- Search for any references or links to this page, and update those to point to the new location. 
+- If there are no modifications to the source file itself, skip ahead to step 11, since the other
+  steps only apply to source files that had their content changed.
+
+### 6. Write/Update the source summary page
 
 If the file was modified or created:
 - Write `wiki/pages/<slug>.md`, using the Wiki Resource Page template, replacing it if necessary.
 
-### 6. Cite as you write — do not skip
+### 7. Cite as you write — do not skip
 
 While drafting the Summary, Key Takeaways, and any other prose section, every non-common-knowledge 
 factual claim must carry a footnote. 
@@ -107,7 +115,7 @@ weaken the claim ("the paper suggests..."), or drop it.
 Footnotes go at the bottom of the page, below all sections. Number them sequentially in order of 
 first reference.
 
-### 7. Self-check before continuing
+### 8. Self-check before continuing
 
 Re-read the draft once. Three passes:
 
@@ -125,7 +133,7 @@ Re-read the draft once. Three passes:
 
 Only when all three passes are clean do you move on to entity pages.
 
-### 7. Update entity and concept pages
+### 9. Update entity and concept pages
 
 For each entity/concept touched by this source:
 
@@ -136,7 +144,7 @@ For each entity/concept touched by this source:
 
 Write `wiki/pages/<slug>.md`, using the Wiki Concept Page template.
 
-### 8. Backlink audit — do not skip
+### 10. Backlink audit — do not skip
 
 Scan ALL existing pages in `wiki/pages/` for any that mention this source's entities/concepts but 
 don't yet link to the new page. Add new cross-references to the new page. You can use `okf 
@@ -163,7 +171,7 @@ leaves no contradiction metadata on any page.
 **Scope — what to compare (do NOT re-read the whole wiki):**
 - each page you wrote/edited against itself (internal contradictions), and
 - each page you wrote/edited against the pages you already read this update — the
-  entity/concept pages from step 7 and the neighbor pages from the step 8 backlink audit.
+  entity/concept pages from step 9 and the neighbor pages from the step 10 backlink audit.
 
 A conflict with some distant page you never opened is out of scope here — the periodic
 `wiki-lint` sweep is the backstop for that.
@@ -179,7 +187,7 @@ A conflict with some distant page you never opened is out of scope here — the 
    contradiction-check: failed — launch year conflicts with [[that-model]] (2024 vs 2023)
    ```
    Use `internal` in place of the `[[slug]]` for a within-page conflict. Then **stop — do
-   not proceed to the commit step (step 12).** Surface the conflict (both claims, both
+   not proceed to the commit step (step 14).** Surface the conflict (both claims, both
    locations) and offer the user these resolutions:
    - correct the newly-written page,
    - correct the counterpart page,
@@ -192,10 +200,10 @@ A conflict with some distant page you never opened is out of scope here — the 
 
 2. **Soft** — a tension that is not a true conflict: differing emphasis, values within
    plausible version/measurement variance, or claims that hold under different scope. Do
-   **not** write anything to any page and do **not** block. Note it for the step 11 summary
+   **not** write anything to any page and do **not** block. Note it for the step 13 summary
    so the user can act if they wish; the periodic `wiki-lint` sweep is the backstop.
 
-### 10. Regenerate `wiki/pages/index.md`
+### 11. Regenerate `wiki/pages/index.md`
 
 Do **not** hand-edit the index. Every page you wrote this update already carries the important 
 fields in its frontmatter — that is the index's source of truth. Regenerate it:
@@ -207,16 +215,16 @@ okf index wiki/pages
 If the generator warns about a page with no frontmatter or a page lands in `Uncategorized`, fix 
 that page's frontmatter and rerun.
 
-### 11. Update `wiki/overview.md`
+### 12. Update `wiki/overview.md`
 
 Re-read the current overview (if it exists).
 
 Create or update it as described in the SCHEMA.md doc. 
 
-### 12. Record the operation
+### 13. Record the operation
 
 **Gate first:** do not suggest a commit while any page touched this update still carries a
-`contradiction-check: failed` line (step 9). Resolve the blocking contradiction and remove
+`contradiction-check: failed` line (step 11). Resolve the blocking contradiction and remove
 the line first — committed pages are always clean.
 
 Per SCHEMA's **Operation Log & Commit Convention**:
@@ -236,7 +244,7 @@ Per SCHEMA's **Operation Log & Commit Convention**:
   by new content. Update the relevant section in-place, bump the `updated` frontmatter date, and 
   record what changed in the operation log (a commit on a git wiki). The log is the historical 
   record; pages are the current truth.
-- **Skipping the backlink audit (step 8)** — A wiki's value compounds through bidirectional links. 
+- **Skipping the backlink audit (step 10)** — A wiki's value compounds through bidirectional links. 
   Always scan existing pages for entities this source introduces.
 - **Inventing `[[slug]]` links** — Never write a cross-reference to a slug you have not confirmed 
   exists or are creating now. A link that resolves to nothing is a hallucinated link. Verify against 
@@ -244,7 +252,7 @@ Per SCHEMA's **Operation Log & Commit Convention**:
 - **Summarizing the abstract instead of synthesizing** — The Summary section should reflect your 
   own synthesis, not a rephrased abstract.
 
-### 13. Commit
+### 14. Commit
 
 1. Save the most recent commit hash into wiki/last_update.yml. Replace the file if it already exists. Use this template:
 ``` yaml
@@ -253,12 +261,12 @@ commit_hash: <hash>
 
 2. Commit the changes to the repo, and push those changes to origin if there is an origin remote configured.
 
-### 14. Report to user
+### 15. Report to user
 
 - Summary page: `wiki/pages/<slug>.md`
 - Entity/concept pages created or updated: <list>
 - Pages that received backlinks: <list>
 - Index and overview updated
-- Soft tensions noted (step 9): <list any non-blocking tensions, or "none"> — not recorded on any page; act on them if you want
+- Soft tensions noted (step 11): <list any non-blocking tensions, or "none"> — not recorded on any page; act on them if you want
 
 
