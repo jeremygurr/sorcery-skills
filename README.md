@@ -18,10 +18,10 @@ project. Every so often you should run a /wiki-lint to check standards and consi
 
 # Notes
 
-- The WIKI-SCHEMA.md file gets copied from the sourcery repo to your project. It contains
+- The WIKI-SCHEMA.md file gets copied from the sorcery repo to your project. It contains
   information about how the wiki is to be maintained. Generally you shuold not modify it, but if you
   find a need to, and you want it to last for future projects, you should raise a PR to the
-  sourcery repo with that change. When you pull updates from the sourcery repo and run the setup
+  sorcery repo with that change. When you pull updates from the sorcery repo and run the setup
   skill, it will replace your SCHEMA file with what's in the repo. This file gets loaded into the
   context only when needed (most wiki skills will need it).
 - Use AGENTS.md for local settings that apply to every prompt. The setup adds a couple sections to
@@ -32,8 +32,8 @@ project. Every so often you should run a /wiki-lint to check standards and consi
 ## 1. Clone the repo
 ``` bash
 # Something like:
-git clone http://127.0.0.1:3001/zarisoft/sourcery.git
-cd sourcery
+git clone http://127.0.0.1:3001/zarisoft/sorcery-skills.git
+cd sorcery-skills
 ```
 
 ## 2. Remove the old wiki skills if you have them, since they now conflict
@@ -71,7 +71,7 @@ link_pi_skills() {
   done
 }
 
-# While in the sourcery folder:
+# While in the sorcery-skills folder:
 link_pi_skills skills
 
 ```
@@ -88,12 +88,12 @@ pi
 
 ## 5. Run the setup skill in pi:
 ```
-/skill:sourcery-setup
+/skill:sorcery-setup
 ```
 
 This can be run multiple times safely, and it will replace the created files each time. This is 
 important if you want to update the repo, because some files are copied from the skill into the 
-repo itself. So to cleanly update the sourcery repo, do a pull there, then go to pi in your 
+repo itself. So to cleanly update the sorcery repo, do a pull there, then go to pi in your 
 project repo, and run the setup skill again, and it will take care of the rest. 
 
 ## 6. Follow the instructions of the setup skill

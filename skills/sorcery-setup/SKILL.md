@@ -1,6 +1,6 @@
 ---
-name: sourcery-setup
-description: "Configure this repo for the sourcery skills: set up rules for analyzing this repo using the wiki first. Run once before first use of the other sourcery skills."
+name: sorcery-setup
+description: "Configure this repo for the sorcery skills: set up rules for analyzing this repo using the wiki first. Run once before first use of the other sorcery skills."
 disable-model-invocation: true
 ---
 
@@ -11,10 +11,10 @@ with the user, then write.
 
 ## Process
 
-### 1. Check for incomplete or outdated installation of sourcery skills
+### 1. Check for incomplete or outdated installation of sorcery skills
 
 If an older copy of this skill — the setup-wizard-skills folder or the wizard-setup folder —
-exists in ~/.pi/agent/skills, tell the user that this skill has been renamed to sourcery-setup and
+exists in ~/.pi/agent/skills, tell the user that this skill has been renamed to sorcery-setup and
 the old folder should be removed. Ask if they want you to remove it for them.
 
 If any of these skills/folders are missing from ~/.pi/agent/skills:
@@ -24,7 +24,7 @@ If any of these skills/folders are missing from ~/.pi/agent/skills:
 - wiki-merge
 - wiki-update
 
-Then: Tell the user they need to link the skills from the sourcery repo to this folder. Assist
+Then: Tell the user they need to link the skills from the sorcery repo to this folder. Assist
 them if necessary.
 
 ### 2. Verify prerequisites
@@ -110,5 +110,5 @@ ask for verification, just do it.
 
 ### 7. Done
 
-Tell the user: "Run this skill again if there is a change in the sourcery repo".
+Tell the user: "Run this skill again if there is a change in the sorcery repo".
 

@@ -15,7 +15,7 @@ pass become findings.
 ## Pre-condition
 
 If: wiki/WIKI-SCHEMA.md doesn't exist
-Then: Tell the user they need to run the sourcery-setup skill first, and abort this skill.
+Then: Tell the user they need to run the sorcery-setup skill first, and abort this skill.
 Else: read the wiki/WIKI-SCHEMA.md file if it hasn't been read already. 
 
 ```
