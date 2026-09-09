@@ -1,17 +1,33 @@
 ---
-name: wizard-setup
-description: "Configure this repo for the wizard skills: set up rules for analyzing this repo using the wiki first. Run once before first use of the other wizard skills."
+name: sourcery-setup
+description: "Configure this repo for the sourcery skills: set up rules for analyzing this repo using the wiki first. Run once before first use of the other sourcery skills."
 disable-model-invocation: true
 ---
 
-# Wizard Setup
+# Sourcery Setup
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm 
 with the user, then write.
 
 ## Process
 
-### 0. Verify prerequisites
+### 1. Check for incomplete or outdated installation of sourcery skills
+
+If an older copy of this skill — the setup-wizard-skills folder or the wizard-setup folder —
+exists in ~/.pi/agent/skills, tell the user that this skill has been renamed to sourcery-setup and
+the old folder should be removed. Ask if they want you to remove it for them.
+
+If any of these skills/folders are missing from ~/.pi/agent/skills:
+- approved
+- wiki-audit
+- wiki-lint
+- wiki-merge
+- wiki-update
+
+Then: Tell the user they need to link the skills from the sourcery repo to this folder. Assist
+them if necessary.
+
+### 2. Verify prerequisites
 
 Verify that the user has the `okf` command in their path. If not, tell them that they must install
 okf before you can proceed with this setup. 
@@ -23,7 +39,7 @@ Ways to install okf:
 
 Guide them through getting okf installed if needed, but don't move forward until it is successfully installed.
 
-### 1. Modify AGENTS file
+### 3. Modify AGENTS file
 
 Look inside of the AGENTS.md file at the root of this repo. 
 
@@ -67,7 +83,7 @@ section is not already there:
 - Maximum number of subagents at one time is 1, unless the user otherwise specifies. This adjusts max concurrency accordingly. 
 ```
 
-### 2. Create directory structure
+### 4. Create directory structure
 
 Create these directories at the repo root if they don't exist:
 
@@ -80,19 +96,19 @@ Create these directories at the repo root if they don't exist:
 
 **Critical:** `wiki/pages/` is flat. All pages live here as `<slug>.md`. No subdirectories. Slugs are lowercase, hyphen-separated.
 
-### 3. Copy assets
+### 5. Copy assets
 
 Copy this skill's `assets/WIKI-SCHEMA.md` to `<repo-root>/wiki/WIKI-SCHEMA.md`, replacing any pre-existing
 files. Don't ask for verification, just do it.
 Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-existing files. Don't
 ask for verification, just do it.
 
-### 4. Commit and push
+### 6. Commit and push
 
 1. Commit the changes. Don't ask for verification.
 2. If a remote named origin exists, push to it.
 
-### 5. Done
+### 7. Done
 
-Tell the user: "Run this skill again if there is a change in the wizard-skills repo".
+Tell the user: "Run this skill again if there is a change in the sourcery repo".
 

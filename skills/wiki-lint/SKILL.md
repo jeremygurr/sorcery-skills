@@ -13,7 +13,7 @@ the operation.
 ## Pre-condition
 
 If: wiki/WIKI-SCHEMA.md doesn't exist
-Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
+Then: Tell the user they need to run the sourcery-setup skill first, and abort this skill.
 Else: read the wiki/WIKI-SCHEMA.md file if it hasn't been read already. 
 
 - **Phase 2** runs `bin/lint-mechanical.py`, which computes the deterministic checks (graph

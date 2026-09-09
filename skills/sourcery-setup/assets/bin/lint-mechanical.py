@@ -21,7 +21,7 @@ def _find_repo_root():
     """Repo root = nearest ancestor of this file that contains wiki/pages.
 
     Works whether the scripts live at <repo>/bin/ (SCHEMA pre-commit gate) or
-    <repo>/wiki/bin/ (setup-wizard copy, wiki-lint invocation).
+    <repo>/wiki/bin/ (sourcery-setup copy, wiki-lint invocation).
     """
     d = Path(__file__).resolve().parent
     while d != d.parent and not (d / "wiki" / "pages").is_dir():

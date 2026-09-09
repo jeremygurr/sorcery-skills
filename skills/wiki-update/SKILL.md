@@ -66,7 +66,7 @@ Else: Process each file sequentially.
 Do this if the wiki/WIKI-SCHEMA.md file hasn't already been read:
 
 If: wiki/WIKI-SCHEMA.md doesn't exist
-Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
+Then: Tell the user they need to run the sourcery-setup skill first, and abort this skill.
 Else: read the wiki/WIKI-SCHEMA.md file.
 
 ### 2. Read the source in full
