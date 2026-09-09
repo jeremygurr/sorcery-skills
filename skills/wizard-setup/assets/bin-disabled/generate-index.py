@@ -10,7 +10,7 @@ from pathlib import Path
 
 WIKI_ROOT = Path(__file__).resolve().parent.parent
 PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
-SCHEMA = WIKI_ROOT / "SCHEMA.md"
+SCHEMA = WIKI_ROOT / "WIKI-SCHEMA.md"
 INDEX = WIKI_ROOT / "wiki" / "index.md"
 
 
@@ -41,7 +41,7 @@ def parse_frontmatter(text):
 def read_link_style():
     """Return the wiki's cross-reference style: 'markdown' or 'obsidian' (default).
 
-    Reads the `link_style:` field from SCHEMA.md's Cross-References section. A missing
+    Reads the `link_style:` field from WIKI-SCHEMA.md's Cross-References section. A missing
     field (older wiki) or an unfilled `<...>` placeholder defaults to obsidian.
     """
     if not SCHEMA.exists():
@@ -64,7 +64,7 @@ def format_ref(slug, link_style):
 
 
 def read_schema():
-    """Return (domain, [categories]) parsed from SCHEMA.md."""
+    """Return (domain, [categories]) parsed from WIKI-SCHEMA.md."""
     domain, categories = "", []
     if not SCHEMA.exists():
         return domain, categories

@@ -18,7 +18,7 @@ project. Every so often you should run a /wiki-lint to check standards and consi
 
 # Notes
 
-- The SCHEMA.md file gets copied from the wizard-skills repo to your project. It contains
+- The WIKI-SCHEMA.md file gets copied from the wizard-skills repo to your project. It contains
   information about how the wiki is to be maintained. Generally you shuold not modify it, but if you
   find a need to, and you want it to last for future projects, you should raise a PR to the
   wizard-skills repo with that change. When you pull updates from the wizard repo and run the setup

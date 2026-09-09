@@ -63,11 +63,11 @@ Else: Process each file sequentially.
 
 ### 1. Load the SCHEMA
 
-Do this if the wiki/SCHEMA.md file hasn't already been read:
+Do this if the wiki/WIKI-SCHEMA.md file hasn't already been read:
 
-If: wiki/SCHEMA.md doesn't exist
+If: wiki/WIKI-SCHEMA.md doesn't exist
 Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
-Else: read the wiki/SCHEMA.md file.
+Else: read the wiki/WIKI-SCHEMA.md file.
 
 ### 2. Read the source in full
 
@@ -191,7 +191,7 @@ on — remove it or create its page.
 ### 11. Contradiction check — do not skip
 
 Now that every page this update touched is written and you have its neighbors in context, check for
-contradictions. Read the **Contradiction Check** section in `SCHEMA.md` for the full convention.
+contradictions. Read the **Contradiction Check** section in `WIKI-SCHEMA.md` for the full convention.
 This is a gate, not an annotation: a clean update leaves no contradiction metadata on any page.
 
 **Scope — what to compare (do NOT re-read the whole wiki):**
@@ -247,7 +247,7 @@ if that text has shifted because of the modification.
   Always scan existing pages for entities this source introduces.
 - **Inventing `[[slug]]` links** — Never write a cross-reference to a slug you have not confirmed 
   exists or are creating now. A link that resolves to nothing is a hallucinated link. Verify against 
-  the existing page set (`ls wiki/pages/`); see the Concept Identity rule in `SCHEMA.md`.
+  the existing page set (`ls wiki/pages/`); see the Concept Identity rule in `WIKI-SCHEMA.md`.
 - **Summarizing the abstract instead of synthesizing** — The Summary section should reflect your 
   own synthesis, not a rephrased abstract.
 
@@ -271,7 +271,7 @@ that page's frontmatter and rerun.
 
 Re-read the current overview (if it exists).
 
-Create or update it as described in the SCHEMA.md doc. 
+Create or update it as described in the WIKI-SCHEMA.md doc. 
 
 ### 3. Record the operation
 

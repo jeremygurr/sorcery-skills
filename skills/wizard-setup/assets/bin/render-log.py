@@ -2,7 +2,7 @@
 """Render the wiki operation log from git history.
 
 In a git wiki, each operation is recorded as a commit carrying a `Wiki-Op:` trailer
-(see the Operation Log & Commit Convention in SCHEMA.md). This renders those commits as
+(see the Operation Log & Commit Convention in WIKI-SCHEMA.md). This renders those commits as
 a human-readable, newest-first log on demand — replacing a hand-maintained log.md.
 Commits without a `Wiki-Op:` trailer (e.g. manual edits) are ignored.
 """

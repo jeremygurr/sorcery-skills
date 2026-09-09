@@ -1,10 +1,10 @@
 ---
-name: setup-wizard-skills
+name: wizard-setup
 description: "Configure this repo for the wizard skills: set up rules for analyzing this repo using the wiki first. Run once before first use of the other wizard skills."
 disable-model-invocation: true
 ---
 
-# Setup Wizard Skills
+# Wizard Setup
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm 
 with the user, then write.
@@ -82,7 +82,7 @@ Create these directories at the repo root if they don't exist:
 
 ### 3. Copy assets
 
-Copy this skill's `assets/SCHEMA.md` to `<repo-root>/wiki/SCHEMA.md`, replacing any pre-existing
+Copy this skill's `assets/WIKI-SCHEMA.md` to `<repo-root>/wiki/WIKI-SCHEMA.md`, replacing any pre-existing
 files. Don't ask for verification, just do it.
 Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-existing files. Don't
 ask for verification, just do it.

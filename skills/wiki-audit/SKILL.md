@@ -14,9 +14,9 @@ pass become findings.
 
 ## Pre-condition
 
-If: wiki/SCHEMA.md doesn't exist
+If: wiki/WIKI-SCHEMA.md doesn't exist
 Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
-Else: read the wiki/SCHEMA.md file if it hasn't been read already. 
+Else: read the wiki/WIKI-SCHEMA.md file if it hasn't been read already. 
 
 ```
 Cite every non-common-knowledge factual claim. Granularity is paragraph or claim,
@@ -26,7 +26,7 @@ Quote:     [^N]: <target> <locator> — "<verbatim quote>"
 Synthesis: [^N]: <target> <locator> [synthesis] — <what supports the claim>
 
 Three rules:
-1. Target is must be one of the three types of wiki link targets specified in the SCHEMA.md and
+1. Target is must be one of the three types of wiki link targets specified in the WIKI-SCHEMA.md and
    strictly follow the format and rules of those targets.  If pointing to a wiki slug, it can only be
    one of these types: Sources | Modules | APIs | Decisions | Flows. Never an Entity / Concept /
    Analysis page.
@@ -63,19 +63,19 @@ claim becomes a Phase A finding. Still run Phase A; skip Phase B.
 
 Dispatch one subagent. Give it:
 - The full page contents.
-- Everything in `SCHEMA.md`.
+- Everything in `WIKI-SCHEMA.md`.
 - The page's `sources:` list.
 
 Task: list every non-common-knowledge factual claim that lacks a footnote. Return a structured list
 of `(line number, claim text, suggested-source-from-the-sources-list-or-"unknown")`.
 
-The subagent applies the SCHEMA.md "what to cite" rule: paragraph- or claim-level granularity,
+The subagent applies the WIKI-SCHEMA.md "what to cite" rule: paragraph- or claim-level granularity,
 common knowledge exempt.
 
 ### 3. Phase B — cited claim verification (N subagents, parallel)
 
 For every footnote definition in the page, parse:
-- The **target** — one of the wiki target types specified in SCHEMA.md
+- The **target** — one of the wiki target types specified in WIKI-SCHEMA.md
 - The **semantic locator** (§section, p.N, timestamp, URL anchor, dated post).
 - The **line-range** `L<start>-<end>` if present (text-addressable sources carry one).
   this part, if applicable, should be both in the user viewable part of the link, and the actual
@@ -191,7 +191,7 @@ Carry the Phase C findings into step 4's report.
 
 Always write — do not ask permission. Path: `wiki/reports/audit-<page-slug>-<today>.md`. The
 template below uses obsidian-style slug references for readability; in the actual report, every slug
-reference must follow the SCHEMA.md standards.
+reference must follow the WIKI-SCHEMA.md standards.
 
 ```markdown
 ---

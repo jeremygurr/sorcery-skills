@@ -34,7 +34,7 @@ PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
 CONFIG_DIR = WIKI_ROOT / "wiki" / "config"
 FAMILIES_FILE = CONFIG_DIR / "slug-families.txt"
 
-# Required per-page fields per wiki/SCHEMA.md page templates (both resource and
+# Required per-page fields per wiki/WIKI-SCHEMA.md page templates (both resource and
 # concept pages carry these; `resource`/`sources` are type-specific and checked by
 # the schema, not here).
 REQUIRED_FIELDS = ("type", "title", "description", "tags", "generated", "updated")

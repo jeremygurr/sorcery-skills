@@ -9,15 +9,15 @@ Consolidate two pages into one (**merge**), or separate one overloaded page into
 qualified pages (**split**). Both operations rewrite the link graph, so they are
 deliberate, confirmed, and verified — never automatic.
 
-The slug is the concept's identity (see the **Concept Identity** section of `SCHEMA.md`).
+The slug is the concept's identity (see the **Concept Identity** section of `WIKI-SCHEMA.md`).
 Merge and split are how identity changes safely: every inbound `[[slug]]` is rewritten so
 no link is left resolving to nothing.
 
 ## Pre-condition
 
-If: wiki/SCHEMA.md doesn't exist
+If: wiki/WIKI-SCHEMA.md doesn't exist
 Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
-Else: read the wiki/SCHEMA.md file if it hasn't been read already. 
+Else: read the wiki/WIKI-SCHEMA.md file if it hasn't been read already. 
 
 ## Choose the operation
 
@@ -97,7 +97,7 @@ Convention**:
 ### 1. Define the senses and slugs
 
 Identify each distinct sense the overloaded page conflates. Propose a qualified slug per
-sense, following the disambiguation convention in `SCHEMA.md` (narrowest discriminator
+sense, following the disambiguation convention in `WIKI-SCHEMA.md` (narrowest discriminator
 that disambiguates):
 
 > `[transformer]` overloads two senses →

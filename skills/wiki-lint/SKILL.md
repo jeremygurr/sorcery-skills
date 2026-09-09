@@ -12,9 +12,9 @@ the operation.
 
 ## Pre-condition
 
-If: wiki/SCHEMA.md doesn't exist
+If: wiki/WIKI-SCHEMA.md doesn't exist
 Then: Tell the user they need to run the setup-wizard-skills skill first, and abort this skill.
-Else: read the wiki/SCHEMA.md file if it hasn't been read already. 
+Else: read the wiki/WIKI-SCHEMA.md file if it hasn't been read already. 
 
 - **Phase 2** runs `bin/lint-mechanical.py`, which computes the deterministic checks (graph
   and string properties) with **no LLM and no bodies in your context**, and emits the
@@ -91,7 +91,7 @@ instruction:
 > - `chronological-section` — a page body carries date-stamped journal headers (`## [Month]`,
 >   `**[Month] N update`) that should be integrated in-place.
 > - `missing-source-links` - a page refers to source material files, but does
->   not link to them according to the requirements in SCHEMA.md .
+>   not link to them according to the requirements in WIKI-SCHEMA.md .
 > - `addable-line-range` — a footnote citing a *text-addressable* raw file (markdown /
 >   plaintext / code / cached HTML) with no `L<start>-<end>` token. Exempt: PDFs, transcripts,
 >   live URLs — never flag those.
@@ -113,7 +113,7 @@ First, the one body-level check that needs no page bodies: read `wiki/overview.m
 Then write `wiki/reports/lint-<today>.md` (do not ask permission — always write this), merging
 Phase 2 findings, the deduped Phase 3 findings, and the coverage gaps. The template below
 shows slug references in obsidian form for readability; in the actual report you write, every
-slug reference must follow the `## Emit` rule from `SCHEMA.md`:
+slug reference must follow the `## Emit` rule from `WIKI-SCHEMA.md`:
 
 ```markdown
 ---
