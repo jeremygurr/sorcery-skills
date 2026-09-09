@@ -64,7 +64,7 @@ section is not already there:
 ```markdown
 # Subagent Settings
 
-- Maximum number of subagents at one time is 3. This adjusts max concurrency accordingly. 
+- Maximum number of subagents at one time is 2. This adjusts max concurrency accordingly. 
 ```
 
 ### 2. Create directory structure
