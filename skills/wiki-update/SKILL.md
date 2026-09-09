@@ -10,14 +10,15 @@ Ingests any new source material into the wiki. Read it, then write a summary
 page, update wiki pages, and maintain the index and overview.
 
 The steps from the sections below must be executed like this:
-- Controller Pre-Processing Steps (controller agent)
+- Pre-Processing Steps (controller agent)
 - Source Page Processing Steps (worker agents if processing in parallel, controller agent if processing
   sequentially)
-- Controller Post-Processing Steps (controller agent)
+- Post-Processing Steps (controller agent)
 
-The controller agent refers to the current agent. Worker agents may be spawned later as instructed.
+The controller agent refers to the current agent. Worker agents are basic delegates which may be
+spawned later as instructed.
 
-## Controller Pre-Processing Steps
+## Pre-Processing Steps
 
 We need a list of files that changed (added, modified, moved, or deleted) since the last wiki update.
 
@@ -42,9 +43,10 @@ changed, either created, modified, or deleted.
 
 Run the Source Page Processing Steps below for each file. 
 
-If: There are more than 3 files in the list
-Then: Process each file in a worker subagent. 
-Else: Process each file sequentially in the controller agent.
+If: There are more than 3 files in the list 
+    And the maximum concurrency for subagents > 1
+Then: Process each file in parallel by a subagent. 
+Else: Process each file sequentially.
 
 ## Source Page Processing Steps
 
@@ -216,7 +218,29 @@ A conflict with some distant page you never opened is out of scope here — the 
    **not** write anything to any page and do **not** block. Note it for the step 13 summary
    so the user can act if they wish; the periodic `wiki-lint` sweep is the backstop.
 
-## Controller Post Processing Steps
+### 12. Update all references to this file if it was modified
+
+If the subject file was modified and not newly created, then it may have references to it in
+existing wiki pages. Find all references to this file and check to see if they need to be updated.
+In particular, if there are line number references, those may need to be updated to new line numbers
+if that text has shifted because of the modification. 
+
+### Common Mistakes
+
+- **Appending chronological updates instead of editing in-place** — Wiki pages are living 
+  documents, not journals. Do not add sections like `## April 27 update:` or `**Update:**` followed 
+  by new content. Update the relevant section in-place, bump the `updated` frontmatter date, and 
+  record what changed in the operation log (a commit on a git wiki). The log is the historical 
+  record; pages are the current truth.
+- **Skipping the backlink audit (step 10)** — A wiki's value compounds through bidirectional links. 
+  Always scan existing pages for entities this source introduces.
+- **Inventing `[[slug]]` links** — Never write a cross-reference to a slug you have not confirmed 
+  exists or are creating now. A link that resolves to nothing is a hallucinated link. Verify against 
+  the existing page set (`ls wiki/pages/`); see the Concept Identity rule in `SCHEMA.md`.
+- **Summarizing the abstract instead of synthesizing** — The Summary section should reflect your 
+  own synthesis, not a rephrased abstract.
+
+## Post Processing Steps
 
 These steps are run after all of the Source Page Processing Steps have been completed for all files.
 
@@ -269,19 +293,4 @@ commit_hash: <hash>
 - Pages that received backlinks: <list>
 - Index and overview updated
 - Soft tensions noted (step 11): <list any non-blocking tensions, or "none"> — not recorded on any page; act on them if you want
-
-## Common Mistakes
-
-- **Appending chronological updates instead of editing in-place** — Wiki pages are living 
-  documents, not journals. Do not add sections like `## April 27 update:` or `**Update:**` followed 
-  by new content. Update the relevant section in-place, bump the `updated` frontmatter date, and 
-  record what changed in the operation log (a commit on a git wiki). The log is the historical 
-  record; pages are the current truth.
-- **Skipping the backlink audit (step 10)** — A wiki's value compounds through bidirectional links. 
-  Always scan existing pages for entities this source introduces.
-- **Inventing `[[slug]]` links** — Never write a cross-reference to a slug you have not confirmed 
-  exists or are creating now. A link that resolves to nothing is a hallucinated link. Verify against 
-  the existing page set (`ls wiki/pages/`); see the Concept Identity rule in `SCHEMA.md`.
-- **Summarizing the abstract instead of synthesizing** — The Summary section should reflect your 
-  own synthesis, not a rephrased abstract.
 

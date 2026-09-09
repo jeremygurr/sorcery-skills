@@ -18,7 +18,8 @@ Push the changes if an origin remote is defined.
 
 ## 2. Update wiki
 
-Run the wiki-update skill. After it completes successfully and is committed, push it if a remote
-origin exists. 
+In a subagent with a clean context: Run the wiki-update skill.
 
+If the child agent need clarification or a decision made that requires the users input, pass along
+the question to the user, and they can tell you how to answer the child. 
 

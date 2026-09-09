@@ -50,38 +50,6 @@ updated: { by: <current agent or harness name>/<current model>, at: <current dat
 <how this connects to or updates existing knowledge>
 ```
 
-### Wiki Concept Page
-
-A concept page describe a concept that is part of 1 or more source material files. 
-You must strictly use the following template. Don't add anything to the frontmatter: 
-
-```markdown
----
-type: <Category based on the concept>
-title: <Entity or Concept Name>
-description: <one-line description for the index>
-tags: [entity | concept]
-generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
-updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
-sources:
-  <add a yaml list item with a `resource:` key for each source used in this doc, the value is the repo relative path to the source file>
----
-
-# <Name>
-
-## Description
-
-<synthesis across all sources that discuss this>
-
-## Appearances in Sources
-
-- <slug-reference to source-slug, in the wiki's link_style> — <one-line note>
-
-## Related Concepts
-
-- <slug-reference to related-slug, in the wiki's link_style> — <relationship>
-```
-
 ## Wiki Link Style
 
 This section defines how cross-references and citation targets are written and parsed for wikis.
@@ -107,6 +75,38 @@ list entry, or in a citation must be written as a source path link, never as a b
 text or backticks. A mention that names a source without linking it is a defect. The single 
 exception is the generated `wiki/pages/index.md`, which contains slug references only — never 
 source path links.
+
+### Wiki Concept Page
+
+A concept page describe a concept that is part of 1 or more source material files. 
+You must strictly use the following template. Don't add anything to the frontmatter: 
+
+```markdown
+---
+type: <Category based on the concept>
+title: <Entity or Concept Name>
+description: <one-line description for the index>
+tags: [entity | concept]
+generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+sources:
+  <add a yaml list item with a `resource:` key for each source used in this doc, the value is the repo relative path to the source file>
+---
+
+# <Name>
+
+## Description
+
+<synthesis across all sources that discuss this>
+
+## Appearances in Sources
+
+- <slug-reference to source-slug, in the wiki's link style> — <one-line note>
+
+## Related Concepts
+
+- <slug-reference to related-slug, in the wiki's link style> — <relationship>
+```
 
 ### Emit
 
@@ -218,42 +218,32 @@ undergraduate-level facts in this wiki's domain. Granularity is paragraph or cla
 never per-sentence. If you cannot produce a citation in one of the forms below,
 find one, weaken the claim, or drop it.
 
-Format: Markdown footnotes. Two citation kinds, three valid targets.
-The slug-target form below follows the `link_style` declared above; the examples
-shown here use that style.
+Citations are always of source material, and so the links should always be the source path type,
+including line numbers as part of the link where applicable.
+
+Never cite entity, concept, or analysis pages — those are syntheses, not sources.
 
 **Quote citation** (preferred):
 ```
 The model uses 8 attention heads.[^1]
 
-[^1]: [[attention-is-all-you-need](pages/attention-is-all-you-need.md)] §3.2.2 L142-143 — "We employ h = 8 parallel attention layers"
+[^1]: [[attention-is-all-you-need](../../docs/ai-related/attention-is-all-you-need.md#L142-143)] §3.2.2 L142-143 — "We employ h = 8 parallel attention layers"
 ```
 
 **Synthesis citation** (when no single quote captures the claim):
 ```
 The architecture is fundamentally an encoder-decoder with attention.[^2]
 
-[^2]: [[attention-is-all-you-need](pages/attention-is-all-you-need.md)] §3.2-3.4 [synthesis] L138-202 — encoder, decoder, and
+[^2]: [[attention-is-all-you-need](../../docs/ai-related/attention-is-all-you-need.md#L138-202)] §3.2-3.4 [synthesis] L138-202 — encoder, decoder, and
       attention sections together describe the full multi-head architecture
 ```
 
 `L142-143` / `L138-202` are line ranges in the raw source file. For a quote they mark
 the lines the quote is taken from; for a synthesis they mark the block being summarized.
 
-Three rules for every footnote:
+Two rules for every footnote:
 
-1. **The cited target is one of three forms:**
-   - A slug reference to a source-type wiki page, written in the wiki's
-     `link_style` (preferred for sources you've updated via `wiki-update`)
-   - A source path link to a local file, e.g.
-     `[[scaling-laws.pdf](../../raw/scaling-laws.pdf)]` — for drive-by citations
-     where a synthesis page isn't worth creating. The path follows the relative-path
-     rule and must resolve to an existing file.
-   - `<URL>` — a live URL, tweet, or ephemeral source (no local copy required)
-
-   Never cite entity, concept, or analysis pages — those are syntheses, not sources.
-
-2. **A locator is present.** Always a semantic locator: `§<section>`, `p.<n>`,
+1. **A locator is present.** Always a semantic locator: `§<section>`, `p.<n>`,
    `[HH:MM:SS]` for transcripts, URL anchor for web, or `(YYYY-MM-DD)` for dated posts.
 
    **Plus a line-range when the source is text-addressable.** If the resolved raw
@@ -264,16 +254,14 @@ Three rules for every footnote:
    - `L<n>` — a single line, e.g. `L142`
    - `L142-145,L201-203` — disjoint ranges
 
-   The line range refers to lines in the **raw source file** resolved from the target
-   (`[[slug]]` → its `**Source:**` raw path; or a direct `raw/<file>`/`assets/<file>`).
-   `raw/` is immutable, so these line numbers are stable references.
+   The line range refers to lines in the **source material file** being linked to
 
    A line-range is **required** for text-addressable sources and applies to BOTH
    citation kinds — a `[synthesis]` footnote marks the block it summarizes with `L…`
    just as a quote marks the lines it quotes. **Exempt** (semantic locator only, no
    `L…`): PDFs, transcripts, and live URLs with no local cached copy.
 
-3. **Either a verbatim quote, or the `[synthesis]` tag plus a description** of
+2. **Either a verbatim quote, or the `[synthesis]` tag plus a description** of
    what the cited range supports. No third option.
 
 **Drive-by citation examples:**
