@@ -15,7 +15,14 @@ with the user, then write.
 
 If an older copy of this skill — the setup-wizard-skills folder or the wizard-setup folder —
 exists in ~/.pi/agent/skills, tell the user that this skill has been renamed to sorcery-setup and
-the old folder should be removed. Ask if they want you to remove it for them.
+the old folder or link should be removed. 
+
+They may use the link_pi_skills function from the README.md file to relink the skills:
+
+They just need to run it against their sourcery-skills/skills folder: 
+  `link_pi_skills sourcery-skills/skills`
+
+Help them if needed. 
 
 If any of these skills/folders are missing from ~/.pi/agent/skills:
 - approved

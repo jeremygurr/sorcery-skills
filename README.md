@@ -8,13 +8,17 @@ new prompt in your project has to load into the context a large number of files 
 miss some files in the process. The wiki makes it faster and more reliable. 
 
 So you can choose how to update the wiki:
-- Manually run /wiki-update after you've made significant changes (I prefer this one)
+- Just run /skill:approved after implementing a ticket (which commits, pushes, closes the ticket,
+  then runs the wiki-update) (Preferred if you are using the matt skills to implement tickets).
+- Manually run /wiki-update after you've made significant changes
 - Make a commit hook that automatically runs a update before each commit
 - Have it triggered automatically as a github action when a new merge into main has occurred
 - Have it triggered by another skill as part of a workflow
 
-After implementing a ticket, you may run the /approved skill to commit, push, and /wiki-update your
-project. Every so often you should run a /wiki-lint to check standards and consistency in the wiki.
+Every so often you should run a /wiki-lint to check standards and consistency in the wiki.
+
+If you come across a page that seems to be incorrect or have problems, you can /wiki-audit that
+page. 
 
 # Notes
 
@@ -61,7 +65,7 @@ link_pi_skills() {
         continue
       fi
       target=$pi_skills_path/$skill
-      if [[ -e $target ]]; then
+      if [[ -e $target ]] || [[ -L $target ]]; then
         echo "rm -rf $target" || return 1
         rm -rf $target || return 1
       fi
@@ -111,6 +115,9 @@ This works a little differently than the other tools.
 
 ## 8. Create the new wiki pages.
 
+You can either use the /skill:approved skill to commit, push, close ticket, and then update wiki, or
+you can update the wiki manually:
+
 ```
 /skill:wiki-update
 ```
@@ -137,11 +144,4 @@ something is happening in the code or answer deep research questions about large
 I still recommend keeping source documents from being too big, for the sake of efficiency. Use
 AI to break large documents down into chapter size pieces. Many docs already have chapters, but
 if they don't I'm sure a decent AI model can figure it out. 
-
-# Not yet done, but will be soon:
-
-* Will make an /approved skill that you use after the /implement skill and have reviewed the
-  changes. The approved skill will commit and push the changes, close the ticket, and update
-  the wiki.
-* Will add the audit skill. This is a much deeper review of a document to validate it's information.
 
