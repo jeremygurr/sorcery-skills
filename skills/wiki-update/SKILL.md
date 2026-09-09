@@ -9,6 +9,9 @@ disable-model-invocation: true
 Ingests any new source material into the wiki. Read it, then write a summary 
 page, update wiki pages, and maintain the index and overview.
 
+It can optionally take as a parameter one or more source paths to update. If files are given, then
+skip the logic that computes which files need to be updated, and use this file list instead.
+
 The steps from the sections below must be executed like this:
 - Pre-Processing Steps (controller agent)
 - Source Page Processing Steps (worker agents if processing in parallel, controller agent if processing
@@ -20,7 +23,13 @@ spawned later as instructed.
 
 ## Pre-Processing Steps
 
-We need a list of files that changed (added, modified, moved, or deleted) since the last wiki update.
+### 1. Figure out list of source files to process
+
+We need a list of files that changed (added, modified, moved, or deleted) since the last wiki
+update.
+
+If: one or more file paths were given to this skill as a parameter, then use those files and skip to
+the next step. 
 
 If: the wiki/last_update.yml file exists
 Then: 
@@ -40,6 +49,8 @@ Then: exclude from the update list all files/folders NOT in raw/
 
 Each of these files in the list is called a source material file and represents a file that has been
 changed, either created, modified, or deleted.
+
+### 2. Launch processing agents
 
 Run the Source Page Processing Steps below for each file. 
 

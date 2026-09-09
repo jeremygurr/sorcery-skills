@@ -254,7 +254,7 @@ Two rules for every footnote:
    - `L<n>` — a single line, e.g. `L142`
    - `L142-145,L201-203` — disjoint ranges
 
-   The line range refers to lines in the **source material file** being linked to
+   The line range refers to lines in the **source material file** being linked to.
 
    A line-range is **required** for text-addressable sources and applies to BOTH
    citation kinds — a `[synthesis]` footnote marks the block it summarizes with `L…`
