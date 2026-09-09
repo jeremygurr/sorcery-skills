@@ -19,8 +19,9 @@ Else: read the wiki/SCHEMA.md file if it hasn't been read already.
 
 ### 1. Get list of files that have changed
 
-If: the wiki/last_update.yml file exists
+We need a list of files that changed (added, modified, or deleted) since the last wiki update.
 
+If: the wiki/last_update.yml file exists
 Then: 
   - read the file, grab the value of commit_hash from it
   - figure out the hash of the commit that FOLLOWED this commit_hash
@@ -36,7 +37,8 @@ file.
 If: a raw/ folder exists at the top of this repo
 Then: exclude from the update list all files/folders NOT in raw/
 
-Each of these files in the list is called a source material file.
+Each of these files in the list is called a source material file and represents a file that has been
+changed, either created, modified, or deleted.
 
 If: There are more than 3 files in the list
 Then: Process each file in a subagent. 
@@ -44,18 +46,26 @@ Else: Process each file sequentially.
 
 ### 2. Read the source in full
 
-Read all content. For long sources, read in sections. Do not skip.
+If it's a modified or created file: read all content. For long sources, read in sections. Do not skip.
 
 ### 3. Generate the slug from what you know about this file's identity
 
 Lowercase, hyphens, no special characters.
 Example: "Attention Is All You Need" → `attention-is-all-you-need`
 
-### 4. Write/Update the source summary page
+### 4. Delete file and its references if deleted
 
-Write `wiki/pages/<slug>.md`, using the Wiki Resource Page template, replacing it if necessary.
+If this file was deleted:
+- Delete the corrosponding wiki page if it exists.
+- Search for any references or links to this page, and remove those also. 
+- Skip ahead to step 10, since the other steps only apply to source files that still exist.
 
-### 5. Cite as you write — do not skip
+### 5. Write/Update the source summary page
+
+If the file was modified or created:
+- Write `wiki/pages/<slug>.md`, using the Wiki Resource Page template, replacing it if necessary.
+
+### 6. Cite as you write — do not skip
 
 While drafting the Summary, Key Takeaways, and any other prose section, every non-common-knowledge 
 factual claim must carry a footnote. 
@@ -97,7 +107,7 @@ weaken the claim ("the paper suggests..."), or drop it.
 Footnotes go at the bottom of the page, below all sections. Number them sequentially in order of 
 first reference.
 
-### 6. Self-check before continuing
+### 7. Self-check before continuing
 
 Re-read the draft once. Three passes:
 
