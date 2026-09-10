@@ -62,11 +62,13 @@ The block:
 # Navigating this Repo
 
 This repo consists of two sections: the wiki, and the source material. The wiki section is purely 
-generated from the source material. The wiki section is found in the wiki folder at the root of 
-this repo. The source material consists of all other files in this repo. 
+generated from the source material. The wiki section is found in the wiki/pages folder at the root of 
+this repo. The source material consists of all other files outside of the wiki/ folder in this repo. 
 
 When searching for information from this repo, unless a specific file was referenced in the query, 
 and unless you are executing a wiki modification operation, use the wiki to find the relevant files:
+
+## Wiki Search Process
 
 1. Read `wiki/pages/index.md` first
 
@@ -79,9 +81,17 @@ answer.
 Read the identified pages in full. Follow one level of cross-reference links (matched via the 
 Parsing references in wiki pages rule) if they point to pages that seem relevant to the question.
 
-3. Synthesize the answer
+3. Read the relevant source documents mentioned in the wiki pages you read
 
-Write a response that is grounded in the wiki pages you read.
+4. Synthesize the answer
+
+Write a response that is grounded in the source materials you read. Trust the source materials above
+the wiki. The wiki is only there to guide you to the source materials.
+
+## Other Searches
+
+You do NOT need to do any additional searching beyond this unless the user explicitly says to. You
+don't need to try and grep the entire repo to see what the wiki might have missed. 
 ```
 
 Also add this block to the AGENTS.md file, but only if the Subagent Settings
