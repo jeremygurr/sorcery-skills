@@ -473,3 +473,26 @@ https://github.com/okfcli/okf .
 
 the `okf schema` command will return a json object containing all of the available commands, what they do, and how to use them.
 
+## rg (ripgrep)
+
+If this command `rg` exists in the user's path:
+  Use this instead of `grep` for exact regex matches to recursively search through directories,
+  honoring .gitignore by default. Most grep flags can be used with rg also. But `-r` has a different
+  meaning, so don't use it. All `rg` searches are recursive, so `-r` isn't needed.
+
+## zg (zvec-grep)
+
+If this command `zg` exists in the user's path:
+  If the `.zvec-grep` folder doesn't exist in the root path of this repo:
+    This means the index for zg has not yet been created for this repo. Create it with this command
+    `zg index` run in the repo's root folder.
+  Use `zg query "<subject matter searching for>"` to do a grep-like search of the repo. Unlike
+  `grep`, `zg` does a semantic search that will find any text matching the meaning of the subject
+  matter, instead of exact words. When you know the exact words to search for, use `grep`. When you
+  are searching for broader concepts, use `zg`. 
+
+## Suggestions to User
+
+Suggest to the user of this skill that they should install these tools if they aren't already
+installed.
+

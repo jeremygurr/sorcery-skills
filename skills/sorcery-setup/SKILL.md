@@ -46,6 +46,9 @@ Ways to install okf:
 
 Guide them through getting okf installed if needed, but don't move forward until it is successfully installed.
 
+If they don't have `zg` installed, suggest that they install it to speed up these skills.
+If they don't have `rg` installed, suggest that they install it to speed up these skills.
+
 ### 3. Modify AGENTS file
 
 Look inside of the AGENTS.md file at the root of this repo. 
