@@ -286,11 +286,17 @@ def git(*args):
 
 
 def staged_page_paths():
-    """Yield staged (added/copied/modified) wiki/pages/*.md paths, excluding audit reports."""
+    """Yield staged (added/copied/modified) wiki/pages/*.md paths.
+
+    Excludes the generated index and audit reports — the same exemptions `is_page`
+    applies in full mode. index.md is rebuilt by `okf index` and carries no
+    frontmatter, so gating it would block every commit that regenerates it.
+    """
     out = git("diff", "--cached", "--name-only", "--diff-filter=ACM")
     for path in out.splitlines():
         path = path.strip()
         if (path.startswith("wiki/pages/") and path.endswith(".md")
+                and Path(path).name != "index.md"
                 and not Path(path).name.startswith("audit-")):
             yield path
 
@@ -315,12 +321,13 @@ def collision_for(slug, known, families=None):
         if not partners:
             return None
         group = {slug, *partners}
-        return None if is_declared_family(group, families) else [slug] + partners
-    base = slug.split("-")[0]  # qualified slug vs an existing bare base
-    if base not in others:
-        return None
-    group = {base, slug}
-    return None if is_declared_family(group, families) else sorted([base, slug])
+        return None if is_rs = known - {slug}
+    if "-" not in slug:  # bare slug vs qualified slugs sharing it
+        partners = sorted(s for s in others if s.split("-")[0] == slug)
+        if not partners:
+            return None
+        group = {slug, *partners}
+        return None if is_[base, slug])
 
 
 def run_staged():
@@ -335,14 +342,15 @@ def run_staged():
         slug = Path(path).stem
         try:
             fm, body = split_doc(git("show", f":{path}"))  # the staged blob
-        except RuntimeError:
-            continue
-        missing = missing_fields(fm)
-        if missing:
-            problems.append((slug, f"missing frontmatter: {', '.join(missing)}"))
-        for target in links_in(body):
-            if target not in known:
-                problems.append((slug, f"broken link: [[{target}]]"))
+        except RuntimeErro to gate
+    known = known_slugs()
+    families = slug_families()
+    problems = []
+    for path in staged_page_paths():
+        slug = Path(path).stem
+        try:
+            fm, body = split_doc(git("show", f":{path}"))  # the staged blob
+        except RuntimeErro((slug, f"broken link: [[{target}]]"))
         collision = collision_for(slug, known, families)
         if collision:
             problems.append((slug, f"slug collision: {', '.join(collision)}"))

@@ -90,7 +90,26 @@ section is not already there:
 ```markdown
 # Subagent Settings
 
-- Maximum number of subagents at one time is 1, unless the user otherwise specifies. This adjusts max concurrency accordingly. 
+Maximum number of subagents at one time is 1, unless the user otherwise specifies. This adjusts max concurrency accordingly. 
+```
+
+Also add this block, the same way — only if a Wiki Gates section is not already there:
+
+```markdown
+# Wiki Gates
+
+`wiki/bin/hooks/pre-commit` gates every commit in this repo. It blocks a staged page that carries
+an unresolved contradiction flag, a structural problem (missing frontmatter, a broken link, a slug
+collision), or a link defect (an unresolvable source-path target, a `#L` range that runs past the
+end of the file, a malformed `[[slug]]`). All three checks are deterministic, no LLM.
+
+The hooks are version-controlled but git only uses them when this clone's local config points at
+them — `core.hooksPath` is local config and is NOT version-controlled, so run this once per clone:
+
+    sh wiki/bin/hooks/install.sh      # sets git config core.hooksPath wiki/bin/hooks
+
+This fails silently if skipped: git falls back to `.git/hooks` and no gate fires.
+`git commit --no-verify` bypasses the gate for an intentionally dirty commit.
 ```
 
 ### 4. Create directory structure
@@ -110,15 +129,27 @@ Create these directories at the repo root if they don't exist:
 
 Copy this skill's `assets/WIKI-SCHEMA.md` to `<repo-root>/wiki/WIKI-SCHEMA.md`, replacing any pre-existing
 files. Don't ask for verification, just do it.
-Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-existing files. Don't
-ask for verification, just do it.
+Copy this skill's `assets/bin/*` to `<repo-root>/wiki/bin/`, replacing any pre-existing files. This
+includes `assets/bin/hooks/`, which lands at `<repo-root>/wiki/bin/hooks/`. Don't ask for
+verification, just do it.
+Make sure `wiki/bin/hooks/pre-commit` and `wiki/bin/hooks/install.sh` are executable (`chmod +x`).
 
-### 6. Commit and push
+### 6. Enable the git hooks
+
+The hooks are version-controlled, but git only uses them when this clone's local config points at
+them — `core.hooksPath` lives in `.git/config`, which is not version-controlled. Run the installer:
+
+    sh wiki/bin/hooks/install.sh
+
+Then verify: `git hook run pre-commit`. Don't skip this: without it git falls back to `.git/hooks`,
+the wiki gates never fire, and nothing warns you.
+
+### 7. Commit and push
 
 1. Commit the changes. Don't ask for verification.
 2. If a remote named origin exists, push to it.
 
-### 7. Done
+### 8. Done
 
 Tell the user: "Run this skill again if there is a change in the sorcery repo".
 

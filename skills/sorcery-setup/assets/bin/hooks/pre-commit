@@ -1,0 +1,30 @@
+#!/bin/sh
+# Wiki pre-commit gates — deterministic, no LLM. Blocks a commit that stages a page with:
+#
+#   * an unresolved blocking contradiction flag, `contradiction-check: failed`
+#         (check-contradictions.py)
+#   * a structural problem: missing frontmatter, a broken link, a slug collision
+#         (lint-mechanical.py --staged)
+#   * a link defect the graph checks cannot see: an unresolvable source-path target, a #L range
+#     that runs past the end of the file, a malformed [[slug]] reference
+#         (check-links.py --staged)
+#
+# Enabled per clone — git config is NOT version-controlled, so each clone must run this once:
+#     sh wiki/bin/hooks/install.sh
+# Override an intentional dirty commit with: git commit --no-verify
+ROOT="$(git rev-parse --show-toplevel)"
+BIN="$ROOT/wiki/bin"
+[ -d "$BIN" ] || BIN="$ROOT/bin"          # some repos keep the scripts at <repo>/bin
+
+# Prefer uv (the sorcery toolchain); fall back to the system interpreter.
+if command -v uv >/dev/null 2>&1; then RUN="uv run"; else RUN="python3"; fi
+
+run_gate() {
+  [ -f "$1" ] || return 0                 # gate absent in this wiki — nothing to enforce
+  # shellcheck disable=SC2086
+  $RUN "$@"
+}
+
+run_gate "$BIN/check-contradictions.py" || exit 1
+run_gate "$BIN/lint-mechanical.py" --staged || exit 1
+run_gate "$BIN/check-links.py" --staged || exit 1
