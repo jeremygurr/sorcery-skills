@@ -16,7 +16,11 @@ This means the user has approved the current changes in this repo, and is ready 
 Commit the changes related to the ticket just implemented.
 Push the changes if an origin remote is defined. 
 
-## 2. Update wiki
+## 2. Close current ticket if there is one
+
+If a ticket was just implemented, then close it.
+
+## 3. Update wiki
 
 In a subagent with a clean context: Run the wiki-update skill.
 
