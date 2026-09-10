@@ -11,6 +11,7 @@ page, update wiki pages, and maintain the index and overview.
 
 It can optionally take as a parameter one or more source paths to update. If files are given, then
 skip the logic that computes which files need to be updated, and use this file list instead.
+Otherwise all matching files are processed.
 
 The steps from the sections below must be executed like this:
 - Pre-Processing Steps (controller agent)

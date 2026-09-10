@@ -17,19 +17,10 @@ import sys
 from datetime import date
 from pathlib import Path
 
-def _find_repo_root():
-    """Repo root = nearest ancestor of this file that contains wiki/pages.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from wikilib import LINK_RE, find_repo_root, require_wiki
 
-    Works whether the scripts live at <repo>/bin/ (SCHEMA pre-commit gate) or
-    <repo>/wiki/bin/ (sorcery-setup copy, wiki-lint invocation).
-    """
-    d = Path(__file__).resolve().parent
-    while d != d.parent and not (d / "wiki" / "pages").is_dir():
-        d = d.parent
-    return d
-
-
-WIKI_ROOT = _find_repo_root()
+WIKI_ROOT = find_repo_root()
 PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
 CONFIG_DIR = WIKI_ROOT / "wiki" / "config"
 FAMILIES_FILE = CONFIG_DIR / "slug-families.txt"
@@ -38,15 +29,13 @@ FAMILIES_FILE = CONFIG_DIR / "slug-families.txt"
 # concept pages carry these; `resource`/`sources` are type-specific and checked by
 # the schema, not here).
 REQUIRED_FIELDS = ("type", "title", "description", "tags", "generated", "updated")
-# Cross-reference forms (see config/link-style.md). Reading is permissive — match both so the
-# linter works on any wiki regardless of its link_style, and on wikis that mix the two forms:
-#   obsidian: [[slug]] or [[slug|display]]
-#   markdown: [[slug](slug.md)] / [[slug](pages/slug.md)] / [[slug](/wiki/pages/slug.md)]
-# The markdown path is whatever the emitting page needs to reach the target
-# (relative from inside pages/, or prefixed from outside) — only the [[...]] slug
-# is captured; known-slug validation happens in the link checks below.
-LINK_RE = re.compile(r"\[\[([a-z0-9-]+)\]\([^)]*\1\.md\)\]")
+# Slug references: LINK_RE, shared with check-links.py via wikilib, matches exactly the forms
+# WIKI-SCHEMA.md emits — [[slug](slug.md)], the pages/ and /wiki/pages/ prefixes, and any of
+# those with a trailing #L line range. The path prefix stops short of `../`, so source path
+# links and URLs never register as slug references.
 STALE_MARKERS = ("current", "latest", "recent", "state-of-the-art")
+# Word-boundary match so "recently" / "currently" do not read as stale markers.
+STALE_MARKER_RES = tuple(re.compile(r"\b" + re.escape(m) + r"\b") for m in STALE_MARKERS)
 YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")
 STALE_AGE_DAYS = 90
 DEFAULT_CLUSTER_CAP = 25
@@ -66,8 +55,11 @@ def split_doc(text):
 def parse_frontmatter(text):
     """Return the page's frontmatter as a dict, or None if absent/unterminated.
 
-    Scalar `key: value` lines become strings; `key: [a, b]` inline lists become lists.
-    No third-party YAML dependency.
+    Scalar `key: value` lines become strings; `key: [a, b]` inline lists and the block form
+    (`key:` followed by indented `- item` lines) become lists. A list value is always a list,
+    never a string — a scalar `tags: concept` stays a string and `as_list` normalizes it.
+    Only top-level keys are read, so nested blocks (a concept page's `sources:` entries, a
+    `review:` block) contribute nothing beyond their parent key. No third-party YAML dependency.
     """
     if not text.startswith("---"):
         return None
@@ -76,13 +68,28 @@ def parse_frontmatter(text):
     if end is None:
         return None
     fm = {}
-    for line in lines[1:end]:
+    i = 1
+    while i < end:
+        line = lines[i]
+        i += 1
         if not line.strip() or line.lstrip().startswith("#") or ":" not in line:
             continue
+        if line[0] in " \t":
+            continue  # nested/indented line — belongs to the key above, not a key itself
         key, _, value = line.partition(":")
         key, value = key.strip(), value.strip()
         if value.startswith("[") and value.endswith("]"):
-            items = [v.strip() for v in value[1:-1].split(",") if v.strip()]
+            fm[key] = [v.strip() for v in value[1:-1].split(",") if v.strip()]
+        elif not value:
+            # Block list: `key:` with nothing after it, then indented `- item` lines.
+            items = []
+            while i < end:
+                nxt = lines[i]
+                item = nxt.strip()
+                if not (nxt[:1] in " \t" and item.startswith("-")):
+                    break
+                items.append(item[1:].strip().strip("\"'"))
+                i += 1
             fm[key] = items
         else:
             if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
@@ -91,14 +98,27 @@ def parse_frontmatter(text):
     return fm
 
 
-def links_in(text):
-    """Return the cross-referenced slugs in a page body, in both link styles.
+def as_list(value):
+    """A frontmatter value as a list of strings: a list verbatim, a scalar as one item.
 
-    `LINK_RE` captures the slug from the obsidian form (`[[slug]]`, `[[slug|display]]`) and
-    the markdown form (`[[slug](pages/slug.md)]`) alike, so this works regardless of the
-    wiki's link_style. See config/link-style.md.
+    Guards consumers against a value written as a bare scalar (`tags: concept`), which would
+    otherwise iterate character by character.
     """
-    return [m.strip() for m in LINK_RE.findall(text)]
+    if not value:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return [str(v) for v in value if str(v).strip()]
+    return [str(value)]
+
+
+def links_in(text):
+    """Return the cross-referenced slugs in a page body.
+
+    Takes the slug from every `LINK_RE` form (see wikilib): same-directory, `pages/` and
+    `/wiki/pages/` prefixed, with or without a `#L…` line range. Source path links are
+    excluded by construction, so a citation never registers as a link to a page.
+    """
+    return [m.group("slug") for m in LINK_RE.finditer(text)]
 
 
 def is_page(path):
@@ -206,19 +226,41 @@ def check_slug_collisions(pages, families=None):
     return out
 
 
+def updated_date(value):
+    """The page's `updated` date as a date, or None if absent/unparseable.
+
+    WIKI-SCHEMA.md writes provenance as an inline map — `updated: { by: pi/model, at: <datetime> }`
+    — so the date lives under the `at:` key, not in the value as a whole. A bare `updated: <date>`
+    is also accepted. Reading the raw map string with `date.fromisoformat` always failed, which
+    silently disabled this check for every schema-conformant page.
+    """
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    if text.startswith("{"):
+        m = re.search(r"\bat\s*:\s*([^,}]+)", text)
+        if not m:
+            return None
+        text = m.group(1).strip().strip("\"'")
+    text = text.split("T")[0].split(" ")[0]  # a datetime's date part
+    try:
+        return date.fromisoformat(text)
+    except ValueError:
+        return None
+
+
 def check_stale_date(pages, today):
     out = []
     for slug, page in pages.items():
         fm = page["fm"] or {}
-        updated = fm.get("updated")
-        try:
-            age = (today - date.fromisoformat(updated)).days
-        except (TypeError, ValueError):
+        updated = updated_date(fm.get("updated"))
+        if updated is None:
             continue
+        age = (today - updated).days
         if age <= STALE_AGE_DAYS:
             continue
         body = page["body"].lower()
-        has_marker = any(m in body for m in STALE_MARKERS)
+        has_marker = any(m.search(body) for m in STALE_MARKER_RES)
         has_old_year = any(int(m.group()) <= today.year - 2 for m in YEAR_RE.finditer(body))
         if has_marker or has_old_year:
             out.append({"page": slug})
@@ -246,7 +288,7 @@ def build_clusters(pages, cap):
     """
     by_tag = {}
     for slug, page in pages.items():
-        for tag in (page["fm"] or {}).get("tags") or []:
+        for tag in as_list((page["fm"] or {}).get("tags")):
             by_tag.setdefault(tag, set()).add(slug)
 
     candidates = {frozenset(s) for s in by_tag.values() if len(s) >= 2}
@@ -264,7 +306,7 @@ def build_clusters(pages, cap):
 
 def run_full(today=None, cluster_cap=None):
     today = today or date.today()
-    cluster_cap = cluster_cap or DEFAULT_CLUSTER_CAP
+    cluster_cap = cluster_cap if cluster_cap and cluster_cap > 0 else DEFAULT_CLUSTER_CAP
     pages = load_pages()
     findings = {
         "missing_frontmatter": check_missing_frontmatter(pages),
@@ -302,10 +344,22 @@ def staged_page_paths():
 
 
 def known_slugs():
-    """The slug set used to resolve links/collisions — the working-tree pages on disk."""
-    if not PAGES_DIR.exists():
-        return set()
-    return {p.stem for p in PAGES_DIR.glob("*.md") if is_page(p)}
+    """The slug set used to resolve links/collisions in staged mode — the git index.
+
+    Read from the index rather than the working tree so resolution matches the content being
+    gated: the staged blobs. A page present on disk but never staged is not a valid target, and
+    a page staged then deleted from the working tree still counts. Outside a git repo, fall
+    back to the pages on disk.
+    """
+    try:
+        out = git("ls-files", "--cached", "--", "wiki/pages")
+    except RuntimeError:
+        out = None
+    if out is None:
+        if not PAGES_DIR.exists():
+            return set()
+        return {p.stem for p in PAGES_DIR.glob("*.md") if is_page(p)}
+    return {Path(p).stem for p in out.splitlines() if p.strip() and is_page(Path(p.strip()))}
 
 
 def collision_for(slug, known, families=None):
@@ -321,13 +375,12 @@ def collision_for(slug, known, families=None):
         if not partners:
             return None
         group = {slug, *partners}
-        return None if is_rs = known - {slug}
-    if "-" not in slug:  # bare slug vs qualified slugs sharing it
-        partners = sorted(s for s in others if s.split("-")[0] == slug)
-        if not partners:
-            return None
-        group = {slug, *partners}
-        return None if is_[base, slug])
+        return None if is_declared_family(group, families) else [slug] + partners
+    base = slug.split("-")[0]  # qualified slug vs an existing bare base
+    if base not in others:
+        return None
+    group = {base, slug}
+    return None if is_declared_family(group, families) else sorted([base, slug])
 
 
 def run_staged():
@@ -342,15 +395,14 @@ def run_staged():
         slug = Path(path).stem
         try:
             fm, body = split_doc(git("show", f":{path}"))  # the staged blob
-        except RuntimeErro to gate
-    known = known_slugs()
-    families = slug_families()
-    problems = []
-    for path in staged_page_paths():
-        slug = Path(path).stem
-        try:
-            fm, body = split_doc(git("show", f":{path}"))  # the staged blob
-        except RuntimeErro((slug, f"broken link: [[{target}]]"))
+        except RuntimeError:
+            continue
+        missing = missing_fields(fm)
+        if missing:
+            problems.append((slug, f"missing frontmatter: {', '.join(missing)}"))
+        for target in links_in(body):
+            if target not in known:
+                problems.append((slug, f"broken link: [[{target}]]"))
         collision = collision_for(slug, known, families)
         if collision:
             problems.append((slug, f"slug collision: {', '.join(collision)}"))
@@ -369,11 +421,15 @@ def parse_opt(argv, name, convert):
     prefix = f"--{name}="
     for arg in argv:
         if arg.startswith(prefix):
-            return convert(arg[len(prefix):])
+            try:
+                return convert(arg[len(prefix):])
+            except ValueError:
+                raise SystemExit(f"bad --{name} value: {arg[len(prefix):]!r}")
     return None
 
 
 def main(argv):
+    require_wiki(WIKI_ROOT, "lint-mechanical.py")
     if "--staged" in argv:
         sys.exit(run_staged())
     today = parse_opt(argv, "today", date.fromisoformat)

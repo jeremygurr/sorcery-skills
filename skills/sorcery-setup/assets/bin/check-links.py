@@ -30,22 +30,18 @@ import subprocess
 import sys
 from pathlib import Path
 
-def _find_repo_root():
-    """Repo root = nearest ancestor of this file that contains wiki/pages."""
-    d = Path(__file__).resolve().parent
-    while d != d.parent and not (d / "wiki" / "pages").is_dir():
-        d = d.parent
-    return d
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Link patterns come from wikilib so this gate and lint-mechanical.py cannot drift: LINK_RE
+# (ANY_LINK_RE) walks every `[[display](target)]` to validate targets and line ranges; BARE_RE
+# and PIPE_RE catch the malformed slug forms. wikilib.LINK_RE is the canonical slug-reference
+# pattern the graph checks use.
+from wikilib import ANY_LINK_RE as LINK_RE, BARE_RE, PIPE_RE, find_repo_root, require_wiki
 
-
-WIKI_ROOT = _find_repo_root()
+WIKI_ROOT = find_repo_root()
 PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
 # Wiki documents outside the pages bundle that also carry links (overview + the reports).
 EXTRA_DOCS = [WIKI_ROOT / "wiki" / "overview.md"]
 
-LINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\(([^)\s]+)\)\]")
-BARE_RE = re.compile(r"\[\[([a-z0-9-]+)\](?!\()")
-PIPE_RE = re.compile(r"\[\[([a-z0-9-]+)\|[^\]]+\]\]")
 CODE_SPAN_RE = re.compile(r"`[^`]*`")
 
 
@@ -149,6 +145,7 @@ def run_staged():
 
 
 def main(argv):
+    require_wiki(WIKI_ROOT, "check-links.py")
     if "--staged" in argv:
         return run_staged()
     args = [a for a in argv if not a.startswith("-")]
