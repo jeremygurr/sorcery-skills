@@ -51,6 +51,10 @@ Then: exclude from the update list all files/folders NOT in raw/
 Each of these files in the list is called a source material file and represents a file that has been
 changed, either created, modified, or deleted.
 
+If the list of files is more than 100, then only process the first 100 and tell the user at the end
+that they need to run wiki-update again to do the next batch. At the end, explain to the user that
+only 100 out of <total pages matched> were processed this round. 
+
 ### 2. Launch processing agents
 
 Run the Source Page Processing Steps below for each file. 
