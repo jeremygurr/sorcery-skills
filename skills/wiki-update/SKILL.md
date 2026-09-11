@@ -112,43 +112,15 @@ If the file was modified or created:
 ### 7. Cite as you write — do not skip
 
 While drafting the Summary, Key Takeaways, and any other prose section, every non-common-knowledge 
-factual claim must carry a footnote. 
+factual claim must carry a footnote. Strictly follow the citation rules mentioned in the WIKI-SCHEMA
+previously. 
 
-Two citation kinds, three valid targets:
-
-```
-Quote:     [^N]: <target> <locator> — "<verbatim quote>"
-Synthesis: [^N]: <target> <locator> [synthesis] — <what supports the claim>
-
-<target> is one of:
-  <slug-reference>     — a source wiki page, written in the wiki's link_style
-                         (preferred for the source you're ingesting)
-  <folder>/<file>      — a path, for drive-by citations to other local files
-  <URL>                — a live URL or post
-```
-
-For the source being ingested, the slug-reference target is `<this-source-slug>` written in the 
-form prescribed by the wiki link style. `wiki-update` is creating that page now, so the target 
-exists by the time the page is read.
-
-**Line-range provenance — required for text-addressable sources.** If the raw file you are citing 
-is markdown, plaintext, code, or cached HTML, every footnote to it must carry a line-range token 
-after the semantic locator: `L<start>-<end>` (or `L<n>` for a single line). As you read the raw 
-file, note the line numbers of the passage you are citing — for a quote, the lines the quote is 
-taken from; for a `[synthesis]` claim, the block of lines being summarized. Example:
-
-```
-[^1]: [[<this-source-slug>]] §3.2 L142-143 — "We employ h = 8 parallel attention layers"
-[^2]: [[<this-source-slug>]] §3.2-5.3 [synthesis] L138-202 — encoder/decoder + attention describe the architecture
-```
-
-Sources WITHOUT stable line numbers — PDFs, transcripts, and live URLs with no local cached copy — 
-are exempt: keep the semantic locator (`p.N`, `[HH:MM:SS]`, URL anchor) and omit `L…`.
+Strictly the citation formatting rules specified in WIKI-SCHEMA.md
 
 If you cannot produce either citation kind for a claim, you do not have a citation. Find one, 
 weaken the claim ("the paper suggests..."), or drop it.
 
-Footnotes go at the bottom of the page, below all sections. Number them sequentially in order of 
+Footnotes go in the Citations section of the wiki page. Number them sequentially in order of 
 first reference.
 
 ### 8. Self-check before continuing

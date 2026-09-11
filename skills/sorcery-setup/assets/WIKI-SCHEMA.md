@@ -93,10 +93,27 @@ not to the wiki root. Since all slug pages live flat in `wiki/pages/`:
 Quick check before writing a link: *"From the file I'm editing, does this path reach the target 
 file?"* Open the target from the link and verify it exists.
 
-Source path links are **not** slug references — the slug regex below must not match them, and 
-slug-family / broken-link lints skip them (they are verified by file existence instead; see 
+Source path links are **not** slug references — the slug regex below must not match them, and
+slug-family / broken-link lints skip them (they are verified by file existence instead; see
 Concept Identity). Bare URLs in drive-by (=source material) citations are likewise unchanged by link
 style.
+
+### Percent-encoding a source path that contains a space or a parenthesis
+
+The inner `<path>` of a link may not contain a space or a `)` — the target ends at the first `)` —
+so a source file whose name carries either must be percent-encoded **in the link only**: `%20` for a
+space, `%28` / `%29` for `(` / `)`. The display text is never encoded.
+
+```
+[[Vita Antonii (ACW 010)](../../raw/ancient-christian-writers-collection/Athanasius%20-%20Vita%20Antonii%20EN%20%28Robert%20T.%20Meyer,%201950%29%20ACW%20010_djvu.txt#L806-815)]
+```
+
+`check-links.py` percent-decodes the target before resolving it, so an encoded link is verified —
+existence **and** `#L` range — exactly like a plain one. An unencoded target with a space or a `)`
+is worse than a broken link: the link parser never sees it, so it renders as literal text and no gate
+checks it at all. This is what made the ACW corpus (`raw/ancient-christian-writers-collection/`, all
+51 filenames with spaces and parentheses) uncitable in the schema's link style until the encoding was
+supported; see the lint reports in `wiki/reports/`.
 
 ### Parse
 
@@ -248,6 +265,13 @@ Citations are always of source material, and so the links should always be the s
 including line numbers as part of the link where applicable.
 
 Never cite entity, concept, or analysis pages — those are syntheses, not sources.
+
+Two citation kinds:
+
+```
+Quote:     [^N]: <target> <locator> — "<verbatim quote>"
+Synthesis: [^N]: <target> <locator> [synthesis] — <what supports the claim>
+```
 
 **Quote citation** (preferred):
 ```

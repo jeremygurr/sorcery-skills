@@ -87,3 +87,15 @@ def require_wiki(root, caller):
             "  Not a wiki root — check that this repo was set up by the sorcery-setup skill,\n"
             "  and that the scripts live at wiki/bin/ (or <repo>/bin/) inside it.")
     return root
+equire_wiki(root, caller):
+    """Return `root` if it holds a wiki, else exit non-zero with an actionable message.
+
+    A gate that finds no pages reports "everything clean", which is the failure mode this
+    exists to prevent: an unresolvable root must never look like a pass.
+    """
+    if not (root / "wiki" / "pages").is_dir():
+        raise SystemExit(
+            f"{caller}: no wiki/pages directory under {root}\n"
+            "  Not a wiki root — check that this repo was set up by the sorcery-setup skill,\n"
+            "  and that the scripts live at wiki/bin/ (or <repo>/bin/) inside it.")
+    return root

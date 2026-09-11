@@ -134,6 +134,7 @@ updated: { by: <current agent or harness name>/<current model>, at: <current dat
 - 🔴 Errors: N
 - 🟡 Warnings: N
 - 🔵 Info: N
+- Carried over from the previous report: <defect classes still open, with counts — or "none">
 <!-- note here if any cluster was split (Phase 2 `split: true`): contradiction recall is
      reduced for those pages — they were too large a tag group to check together -->
 
@@ -186,6 +187,11 @@ updated: { by: <current agent or harness name>/<current model>, at: <current dat
 ## 🔵 Addable Line-Ranges
 - [[page]] [^3] cites text source [[markdown-source]] with no line-range
   Fix: add an `L<start>-<end>` token so wiki-audit can verify it deterministically
+
+## Remediation (applied <date>)
+<What this operation fixed, file by file, with the gate output that proves it — and what is still
+open, with counts. A report that only lists defects makes the next run re-derive whether anything
+was done.>
 ```
 
 ### Offer concrete fixes

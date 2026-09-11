@@ -10,7 +10,13 @@ or the legacy `[[slug|display]]`). This tool closes those gaps:
     is the slug verbatim;
   * every source-path link `[[x](../../target.ext#L…)` resolves to an existing file;
   * every `#L…` line range lies **inside** the target file (no range may run past EOF);
-  * no malformed slug reference remains: bare `[[slug]]` or legacy `[[slug|display]]`.
+  * no malformed slug reference remains: bare `[[slug]]` or legacy `[[slug|display]]`;
+  * no malformed *link* — `[[display](target)` with the closing `]` missing. Both slug regexes
+    above require the trailing `]`, so this class is invisible to every other gate and renders a
+    stray `[`;
+  * footnote definitions that cite a **wiki page** instead of source material (`§ Citations`:
+    a citation must be a source path link). Reported as one line per page — it is a corpus-wide
+    migration, so it fails the run only under `--strict-citations`.
 
 The line-range rule is the important one: `wiki-audit` relies on `L<start>-<end>` tokens to
 verify quotes, so a range that runs past the end of the file silently defeats it. 139 such
@@ -21,6 +27,7 @@ Usage:
   check-links.py helaman alma        # named slugs
   check-links.py wiki/pages/foo.md   # named paths
   check-links.py --staged            # staged wiki/pages/*.md only (pre-commit gate)
+  check-links.py --strict-citations  # also fail on footnotes that cite a wiki page
 
 Exit 0 = clean, 1 = problems (printed). Stdlib only.
 """
@@ -35,7 +42,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 # (ANY_LINK_RE) walks every `[[display](target)]` to validate targets and line ranges; BARE_RE
 # and PIPE_RE catch the malformed slug forms. wikilib.LINK_RE is the canonical slug-reference
 # pattern the graph checks use.
-from wikilib import ANY_LINK_RE as LINK_RE, BARE_RE, PIPE_RE, find_repo_root, require_wiki
+from wikilib import ANY_LINK_RE as LINK_RE, BARE_RE, PIPE_RE, decode_target, find_repo_root, require_wiki
 
 WIKI_ROOT = find_repo_root()
 PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
@@ -43,6 +50,18 @@ PAGES_DIR = WIKI_ROOT / "wiki" / "pages"
 EXTRA_DOCS = [WIKI_ROOT / "wiki" / "overview.md"]
 
 CODE_SPAN_RE = re.compile(r"`[^`]*`")
+
+# An attempted link whose target is not followed by the closing `]`: `[[display](target)`.
+# `[^\]\n]*` between `[[` and `](` keeps this to real link attempts, so transcript-diff text such
+# as `-[[2 Hebrew words]]-` is not mistaken for one.
+ATTEMPTED_LINK_RE = re.compile(r"\[\[[^\]\n]*\]\(([^)\s]+)\)(?!\])")
+
+# A footnote definition, and a footnote whose *first* link is a wiki page rather than a source.
+# The `../pages/` alternative exists so the check cannot silently miss a wiki-page target written in
+# the non-canonical spelling; `slug.md` is the form actually in use.
+FOOTNOTE_RE = re.compile(r"^\[\^(\d+)\]:\s*")
+FOOTNOTE_SLUG_TARGET_RE = re.compile(
+    r"\[\[[^\]]+\]\((?:\.\./pages/|pages/)?([a-z0-9-]+)\.md(?:#L[\d,-]+)?\)\]")
 
 
 def strip_code(text):
@@ -67,6 +86,9 @@ def check_text(text, display_path, base_dir):
     """Return a list of problem strings for one document's text."""
     problems = []
     for i, line in enumerate(text.splitlines(), 1):
+        for m in ATTEMPTED_LINK_RE.finditer(line):
+            problems.append(f"{display_path}:{i} malformed link [[…]({m.group(1)}) — the closing "
+                            f"']' is missing (WIKI-SCHEMA.md § Emit: \"[[display](target)]\")")
         for m in BARE_RE.finditer(line):
             problems.append(f"{display_path}:{i} malformed slug reference [[{m.group(1)}]] "
                             f"(no (target.md) — it renders as literal text)")
@@ -78,6 +100,7 @@ def check_text(text, display_path, base_dir):
             if re.match(r"^[a-z][a-z0-9+.-]*:", target):   # http:, https:, mailto:
                 continue
             path_part, _, frag = target.partition("#")
+            path_part = decode_target(path_part)      # %20 / %28 / %29 → space / ( / )
             resolved = os.path.normpath(os.path.join(str(base_dir), path_part))
             if not os.path.exists(resolved):
                 problems.append(f"{display_path}:{i} target does not exist: {target}")
@@ -115,8 +138,37 @@ def resolve_arg(arg):
     return PAGES_DIR / f"{arg}.md"      # report it as missing below
 
 
+def check_citations(text, display_path):
+    """Footnote definitions must cite source material, never a wiki page (`§ Citations`).
+
+    `[[slug](slug.md)]` in a footnote satisfies every link check — the page exists, the display
+    text matches the slug — so this class was invisible to all three gates until an LLM sweep read
+    the bodies, and the corpus reached ~1,800 such footnotes (many of them a page citing *itself*).
+    One summary line per page, so the count is a migration-progress number.
+    """
+    offenders = []
+    for line in text.splitlines():
+        m = FOOTNOTE_RE.match(line)
+        if not m:
+            continue
+        link = FOOTNOTE_SLUG_TARGET_RE.match(line[m.end():])
+        if link:
+            offenders.append((m.group(1), link.group(1)))
+    if not offenders:
+        return []
+    first_n, first_slug = offenders[0]
+    return [f"{display_path}: {len(offenders)} footnote definition(s) cite a wiki page instead of "
+            f"source material (first: [^{first_n}] → {first_slug}.md) — WIKI-SCHEMA.md § Citations "
+            f"requires a source path link"]
+
+
 def run_staged():
-    """Pre-commit gate: validate the staged text of staged wiki/pages/*.md."""
+    """Pre-commit gate: validate the staged text of staged wiki/pages/*.md.
+
+    Deliberately excludes `check_citations`: this gate must not stall an ingest that touches pages
+    whose citations are still part of the corpus-wide migration. Promote it (one call, below) once
+    the migration is done.
+    """
     try:
         out = subprocess.run(["git", "-C", str(WIKI_ROOT), "diff", "--cached", "--name-only",
                               "--diff-filter=ACM"], capture_output=True, text=True, check=True).stdout
@@ -148,15 +200,26 @@ def main(argv):
     require_wiki(WIKI_ROOT, "check-links.py")
     if "--staged" in argv:
         return run_staged()
+    strict_citations = "--strict-citations" in argv
     args = [a for a in argv if not a.startswith("-")]
     targets = [resolve_arg(a) for a in args] if args else default_targets()
     problems = []
+    citation_notes = []
     for path in targets:
         if not path.exists():
             problems.append(f"{path} does not exist")
             continue
         rel = os.path.relpath(path, WIKI_ROOT)
-        problems += check_text(strip_code(path.read_text(encoding="utf-8")), rel, path.parent)
+        text = strip_code(path.read_text(encoding="utf-8"))
+        problems += check_text(text, rel, path.parent)
+        citation_notes += check_citations(text, rel)
+    if strict_citations:
+        problems += citation_notes
+    elif citation_notes:
+        print(f"{len(citation_notes)} document(s) cite a wiki page from a footnote instead of source "
+              f"material — not fatal; migrate in batches (--strict-citations to fail on these):")
+        print("\n".join("  " + n for n in citation_notes))
+        print()
     if problems:
         print("\n".join(problems))
         print(f"\n{len(problems)} problem(s) in {len(targets)} document(s)")
