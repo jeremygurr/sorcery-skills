@@ -10,6 +10,9 @@ deterministic script (Phase 2) and per-cluster subagents (Phase 3) do the heavy 
 main thread only assembles findings. Produce a categorized report, offer concrete fixes, log
 the operation.
 
+The user may specify one or more wiki pages to specifically target with this skill. If so, only run
+the linting against those pages and ignore the rest. They may give page slugs or full paths.
+
 ## Pre-condition
 
 If: wiki/WIKI-SCHEMA.md doesn't exist

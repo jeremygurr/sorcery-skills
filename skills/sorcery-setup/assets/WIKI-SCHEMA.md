@@ -158,6 +158,10 @@ updated: { by: <current agent or harness name>/<current model>, at: <current dat
 ## Relation to Other Wiki Pages
 
 <how this connects to or updates existing knowledge>
+
+## Citations
+
+<citations>
 ```
 
 ### Wiki Concept Page
@@ -190,6 +194,10 @@ sources:
 ## Related Concepts
 
 - <slug-reference to related-slug, in the wiki's link style> — <relationship>
+
+## Citations
+
+<citations>
 ```
 
 ## Concept Identity
