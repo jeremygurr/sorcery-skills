@@ -22,6 +22,7 @@ either — `check-links.py` reports those as malformed.
 import re
 import subprocess
 from pathlib import Path
+from urllib.parse import unquote
 
 # Group "slug" (also group 1) is the referenced page. Use .finditer + group("slug"); a
 # findall returns the (slug, target) tuple.
@@ -37,6 +38,16 @@ ANY_LINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\(([^)\s]+)\)\]")
 # pre-standard pipe form.
 BARE_RE = re.compile(r"\[\[([a-z0-9-]+)\](?!\()")
 PIPE_RE = re.compile(r"\[\[([a-z0-9-]+)\|[^\]]+\]\]")
+
+
+def decode_target(target):
+    """Percent-decode the path part of a link target before resolving it on disk.
+
+    A link's inner target may not contain a space or a `)`, so a source path carrying either
+    is written percent-encoded in the link only (`%20`, `%28`, `%29`) — WIKI-SCHEMA.md § Percent-
+    encoding. An encoded link must be verified exactly like a plain one, existence and line range.
+    """
+    return unquote(target)
 
 
 def git_toplevel(start):
@@ -76,18 +87,6 @@ def find_repo_root(start=None):
 
 
 def require_wiki(root, caller):
-    """Return `root` if it holds a wiki, else exit non-zero with an actionable message.
-
-    A gate that finds no pages reports "everything clean", which is the failure mode this
-    exists to prevent: an unresolvable root must never look like a pass.
-    """
-    if not (root / "wiki" / "pages").is_dir():
-        raise SystemExit(
-            f"{caller}: no wiki/pages directory under {root}\n"
-            "  Not a wiki root — check that this repo was set up by the sorcery-setup skill,\n"
-            "  and that the scripts live at wiki/bin/ (or <repo>/bin/) inside it.")
-    return root
-equire_wiki(root, caller):
     """Return `root` if it holds a wiki, else exit non-zero with an actionable message.
 
     A gate that finds no pages reports "everything clean", which is the failure mode this
