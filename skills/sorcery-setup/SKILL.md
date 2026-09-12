@@ -9,6 +9,10 @@ disable-model-invocation: true
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm 
 with the user, then write.
 
+In *clean* mode (sorcery-setup clean), the following folders must be deleted before proceeding with
+this setup:
+  - wiki/bin
+
 ## Process
 
 ### 1. Check for incomplete or outdated installation of sorcery skills
@@ -115,6 +119,10 @@ that is implemented elsewhere in the repo, make links to those related files or 
 numbers in the links where appropriate (example ../src/Main.java#L14-17). 
 
 When reading over documentation that is missing good links, or has invalid links, suggest fixing it. 
+
+If the user ever asks about or wants to change a file in the wiki folder (or any of its subfolders),
+then first read the wiki/WIKI-SCHEMA.md file for instructions about the wiki conventions. Then make
+the requested changes according to those conventions.
 ```
 
 ### 4. Create directory structure

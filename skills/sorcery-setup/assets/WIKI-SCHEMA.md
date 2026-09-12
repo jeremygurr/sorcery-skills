@@ -433,8 +433,7 @@ Note that the Category is written into the `type` field of frontmatter.
 ## The Overview File
 
 The wiki/overview.md file is a special file that is part of the wiki but lies outside of the main
-wiki/pages bundle.  It doesn't have any frontmatter, since it's not a normal wiki page, and so
-doesn't conform to OKF. 
+wiki/pages bundle. 
 
 The overview file contains the map of the source materials in this repo, allowing an agent or human
 user to find their way around the repo efficiently. It serves as an entry point into the wiki, and
@@ -449,8 +448,20 @@ backticked path.
 It is normally produced or updated when the wiki-update skill is run, but the user may directly
 request it to be updated or rebuilt. 
 
-The top section of the overview page, called "Introduction", should be a high level summary of what this
-repo is about and what kinds of data it contains.
+It has a special frontmatter, since it's not a normal wiki page:
+
+```
+---
+type: Overview
+title: Overview
+description: Entrance to the Wiki Pages
+generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+---
+```
+
+The first section of the overview page, called "Introduction", should be a high level summary of what
+this repo is about and what kinds of data it contains.
 
 The second section, called "Project Status". If the project is complete as is, and there's nothing
 interesting to put here, this section can be skipped. But in the case of a work in progress project,
@@ -459,21 +470,25 @@ be worked on in the near future. It should also contain info about, and links to
 wiki/reports folder. This helps the user to understand how recently linting and auditing have been
 done, and gives an idea as to how clean and accurate the wiki is. 
 
-The third section, called "Key Concepts", should break down the most significant concepts covered in
-this repo. For coding repos this would include major frameworks, tools, or components being used.
-For research repos, this could be philosophical concepts, important people or places, or topics
-frequently discussed in the source material. Each should have a sentence or two describing it and
-then link to a deeper exploration page covering that topic. 
+The third section, called "Zones": Break down the files into 3-6 categories called Zones. Describe
+each zone, what is its purpose, what kind of content it contains, and where it is in the filesystem.
+
+The fourth section, called "Core Dependencies": List the components/tools/librarys/external
+documentation that this repo depends on and uses, with a brief description of each. 
+
+Optional sections:
+- Edges Section: If this repo has code, describe how it is started, and where in the code
+  the entrypoint(s) are. 
 
 At the bottom is a link to the Index (`wiki/pages/index.md`).
 
 ### Building the Overview File
 
 Normally the overview file is updated as new source material is ingested into the wiki as part of
-the wiki-update skill. But if the user specifically asks to have the overview updated or rebuilt,
-then the agent will go through the index, reading about every document, and organize the overview as
-specified above. The agent can pull up linked documents from the index as needed to get further
-detail. 
+the wiki-update skill, or if existing material is modified. But if the user specifically asks to
+have the overview updated or rebuilt, then the agent will go through the index, reading about every
+document, and organize the overview as specified above. The agent can pull up linked documents from
+the index as needed to get further detail. 
 
 ## Conventions
 - These wiki skills should never modify anything outside of the wiki folder.
