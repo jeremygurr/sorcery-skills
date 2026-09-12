@@ -463,22 +463,22 @@ updated: { by: <current agent or harness name>/<current model>, at: <current dat
 The first section of the overview page, called "Introduction", should be a high level summary of what
 this repo is about and what kinds of data it contains.
 
-The second section, called "Project Status". If the project is complete as is, and there's nothing
-interesting to put here, this section can be skipped. But in the case of a work in progress project,
-this section will describe recent accomplishments, what is currently being worked on, and what will
-be worked on in the near future. It should also contain info about, and links to, recent reports from the
-wiki/reports folder. This helps the user to understand how recently linting and auditing have been
-done, and gives an idea as to how clean and accurate the wiki is. 
-
-The third section, called "Zones": Break down the files into 3-6 categories called Zones. Describe
+The next section, called "Zones": Break down the files into 3-6 categories called Zones. Describe
 each zone, what is its purpose, what kind of content it contains, and where it is in the filesystem.
 
-The fourth section, called "Core Dependencies": List the components/tools/librarys/external
+The next section, called "Core Dependencies": List the components/tools/librarys/external
 documentation that this repo depends on and uses, with a brief description of each. 
 
 Optional sections:
 - Edges Section: If this repo has code, describe how it is started, and where in the code
   the entrypoint(s) are. 
+
+The next section, called "Project Status". If the project is complete as is, and there's nothing
+interesting to put here, this section can be skipped. But in the case of a work in progress project,
+this section will describe recent accomplishments, what is currently being worked on, and what will
+be worked on in the near future. It should also contain info about, and links to, recent reports from the
+wiki/reports folder. This helps the user to understand how recently linting and auditing have been
+done, and gives an idea as to how clean and accurate the wiki is. 
 
 At the bottom is a link to the Index (`wiki/pages/index.md`).
 
