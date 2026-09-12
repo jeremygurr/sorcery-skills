@@ -8,7 +8,7 @@ Two modes:
 
 Full mode emits a JSON object {"findings": {...}, "clusters": [...]} for wiki-lint to fold
 into its report. Staged mode runs the per-file/resolvable checks against the staged blobs and
-exits non-zero if any fire, so the pre-commit hook blocks the commit. Stdlib only.
+exits non-zero if any fire. Stdlib only.
 """
 import json
 import re

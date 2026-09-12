@@ -58,7 +58,6 @@ clickable. The display text depends on the target kind:
     itself.
 - **URL** [[google.com/coolaistuff](https://google.com/coolaistuff?someparam=somevalue)
 
-
 When a reference is to a certain line number or range of lines in a document, add that to the 
 link in the format github understands: `[[slug](<path>#L4-8)]` or 
 `[[CONTEXT.md](../../CONTEXT.md#L4-8)]` refer to lines 4-8, for example,
@@ -378,27 +377,6 @@ commits. It is a **gate, not an annotation**: every page that lands in git is cl
 
 This flag is also what the **Pre-commit Gate** below scans staged files for.
 
-## Pre-commit Gate
-
-The wiki ships its own git hooks in `wiki/bin/hooks/`; the gate that matters is `pre-commit`. It is
-deterministic and no-LLM, and it blocks a commit that stages a page with any of:
-
-| Gate | Blocks |
-|---|---|
-| `check-contradictions.py` | a page still carrying `contradiction-check: failed` |
-| `lint-mechanical.py --staged` | missing frontmatter, a broken link, a slug collision |
-| `check-links.py --staged` | an unresolvable source-path target, a `#L` range past the end of the file, a malformed `[[slug]]` |
-
-**Enabling it is per clone.** git resolves hooks from `core.hooksPath`, which lives in `.git/config`
-and so cannot be version-controlled. A clone that skips this step silently falls back to
-`.git/hooks` and commits ungated:
-
-    sh wiki/bin/hooks/install.sh      # git config core.hooksPath wiki/bin/hooks
-
-Verify with `git hook run pre-commit`. The gate covers plain `git commit`; it does not run for merge
-commits or for commits created by `git rebase` / `git cherry-pick`, so the periodic `wiki-lint` sweep
-remains the backstop. `git commit --no-verify` bypasses it deliberately.
-
 ## Operation Log & Commit Convention
 Operations: init, update, query, lint, audit, merge, split
 
@@ -515,9 +493,6 @@ detail.
 - contradiction check: update gates on blocking contradictions in touched pages via a transient 
   `contradiction-check: failed` flag, removed before commit — committed pages are always clean (see 
   Contradiction Check)
-- pre-commit gate: the tracked hooks in wiki/bin/hooks/ are enabled per clone with
-  `git config core.hooksPath wiki/bin/hooks` (run `sh wiki/bin/hooks/install.sh`); git config is not
-  version-controlled, so a clone that skips this step commits ungated (see Pre-commit Gate)
 
 # Wiki Tools
 
