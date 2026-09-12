@@ -145,3 +145,24 @@ I still recommend keeping source documents from being too big, for the sake of e
 AI to break large documents down into chapter size pieces. Many docs already have chapters, but
 if they don't I'm sure a decent AI model can figure it out. 
 
+
+## 10. Recommendations for documentation
+
+ ┌────────────────────────────────────────┬───────────────────────────────────────────────────────────────┐
+ │ Discovery/change                       │ Update                                                        │
+ ├────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+ │ Rule every AI must know before acting  │ AGENTS.md                                                     │
+ ├────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+ │ New or clarified Simpleton term        │ CONTEXT.md                                                    │
+ ├────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+ │ Cell creation/modification procedure   │ .agents/skills/simpleton-cell-design or simpleton-cell-change │
+ ├────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+ │ Reusable gotcha or failure pattern     │ wiki/pages/gotchas-and-conventions.md                         │
+ ├────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+ │ Source-backed architecture/navigation  │ wiki pages                                                    │
+ ├────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+ │ Hard-to-reverse architectural decision │ ADR                                                           │
+ ├────────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+ │ Human edited documentation             │ docs                                                          │
+ └────────────────────────────────────────┴───────────────────────────────────────────────────────────────┘
+
