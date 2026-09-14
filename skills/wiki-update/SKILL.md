@@ -9,6 +9,10 @@ disable-model-invocation: true
 Ingests any new source material into the wiki. Read it, then write a summary 
 page, update wiki pages, and maintain the index and overview.
 
+If the agent=<n> parameter is given to this skill:
+Then: subagents may be used as specified later with <n> being the maximum concurrency for those agents. 
+Else: no subagents are spawned in this skill. Everything must be kept within the top level context.
+
 It can optionally take as a parameter one or more source paths to update. If files are given, then
 skip the logic that computes which files need to be updated, and use this file list instead.
 Otherwise all matching files are processed.
@@ -63,10 +67,11 @@ Then:
 
 Run the Source Page Processing Steps below for each file. 
 
-If: There are more than 3 files in the list 
-    And the maximum concurrency for subagents > 1
+
+If: The agents=<n> parameter was given for this skills, 
+    And there are more than 3 files in the list,
 Then: Process each file in parallel by a subagent. 
-Else: Process each file sequentially.
+Else: Process each file sequentially in the same top level context.
 
 ## Source Page Processing Steps
 

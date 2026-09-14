@@ -333,8 +333,8 @@ Two rules for every footnote:
 stamps the audited page with an optional `review:` frontmatter block:
 ```
 review:
-  model: codex          # gemini | claude-sonnet
-  provider: openai      # google | anthropic
+  model: <current LLM model>
+  provider: <current AI harness>
   date: YYYY-MM-DD
   status: clean         # or: disputed
   findings: 2           # present only when status: disputed
@@ -343,7 +343,7 @@ review:
 - `status: disputed` — the reviewer flagged overreach or a contradiction the normal
   audit missed; `findings:` carries the count. The detail lives in the (local-only)
   audit report.
-- `provider: anthropic` (the `claude-sonnet` fallback) means no different-provider CLI
+- `provider: pi` means no different-provider CLI
   was available, so the check is same-provider and weaker.
 
 This block is optional and is added only by `wiki-audit strong`. Pages never need it to
@@ -463,8 +463,10 @@ updated: { by: <current agent or harness name>/<current model>, at: <current dat
 The first section of the overview page, called "Introduction", should be a high level summary of what
 this repo is about and what kinds of data it contains.
 
-The next section, called "Zones": Break down the files into 3-6 categories called Zones. Describe
+The next section, called "Zones": Break down the files into 4-8 categories called Zones. Describe
 each zone, what is its purpose, what kind of content it contains, and where it is in the filesystem.
+When describing a zone, if there's more then 10 words of information, don't format it into large
+paragraphs, but instead use lists, tables, or outlines as appropriate to make it easy to read.
 
 The next section, called "Core Dependencies": List the components/tools/librarys/external
 documentation that this repo depends on and uses, with a brief description of each. 
@@ -472,6 +474,8 @@ documentation that this repo depends on and uses, with a brief description of ea
 Optional sections:
 - Edges Section: If this repo has code, describe how it is started, and where in the code
   the entrypoint(s) are. 
+- Building Section: If this repo has code, describe the proper steps to build it, including the
+  major variations and settings that may be available to modify the built product. 
 
 The next section, called "Project Status". If the project is complete as is, and there's nothing
 interesting to put here, this section can be skipped. But in the case of a work in progress project,

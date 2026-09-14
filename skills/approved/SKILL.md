@@ -14,7 +14,7 @@ This means the user has approved the current changes in this repo, and is ready 
 ## 1. Commit and Push Changes
 
 Commit the changes related to the ticket just implemented.
-Push the changes if an origin remote is defined. 
+Push the changes. 
 
 ## 2. Close current ticket if there is one
 
@@ -22,8 +22,5 @@ If a ticket was just implemented, then close it.
 
 ## 3. Update wiki
 
-In a subagent with a clean context: Run the wiki-update skill.
-
-If the child agent need clarification or a decision made that requires the users input, pass along
-the question to the user, and they can tell you how to answer the child. 
+Run the wiki-update skill.
 
