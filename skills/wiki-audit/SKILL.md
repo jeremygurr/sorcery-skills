@@ -1,8 +1,6 @@
 ---
 name: wiki-audit
-description: Use when fact-checking a single wiki page against its cited sources — verifies that
-every footnote actually supports its claim and surfaces uncited factual claims. Run after ingesting
-a high-stakes page or any time you want confidence in one page's accuracy.
+description: Use when fact-checking a single wiki page against its cited sources — verifies that every footnote actually supports its claim and surfaces uncited factual claims. Run after ingesting a high-stakes page or any time you want confidence in one page's accuracy.
 disable-model-invocation: true
 ---
 
@@ -10,9 +8,10 @@ disable-model-invocation: true
 
 Verify a single wiki page against its cited sources. Two phases: detect uncited factual claims, then
 verify cited claims by dispatching one subagent per source in parallel. In **strong mode**
-(`wiki-audit strong`) a third and fourth phase adds a cross-model adversarial review: a different-provider
+(`wiki-audit strong`) a third phase adds a cross-model adversarial review: a different-provider
 model re-examines the same claims for overreach and contradiction, and disagreements with the normal
-pass become findings.
+pass become findings. Also in strong mode a fourth phase checks if there are any source material
+changes that could add related info not yet captured in the wiki page. 
 
 ## Pre-condition
 
@@ -190,6 +189,13 @@ verified:
 Carry the Phase C findings into step 4's report.
 
 ### 5. Phase D - check source material for info not included in this page (strong mode only)
+
+For each wiki page which is not of type `Sources`:
+  - Search all source material files for references to this wiki page's subject / concept
+  - Check to make sure the source material information about that subject is contained in the wiki
+    page
+  - Update the wiki page as necessary to reflect new or changed information from the source
+    material file.
 
 ### 6. Write the audit report
 
