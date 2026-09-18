@@ -150,8 +150,8 @@ title: <Source Title>
 description: <one-line description of the source file>
 resource: <repo relative path to source material file>
 tags: [<relevant tags>]
-generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
-updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
+generated: { by: <current agent name>/<current AI model>, at: <current datetime> }
+updated: { by: <current agent name>/<current AI model>, at: <current datetime> }
 ---
 
 # <Source Title>

@@ -250,11 +250,6 @@ updated: { by: <agent harness>/<current model>, at: <current datetime> }
 Disposition: surfaced for user review (not auto-applied).
 ```
 
-Include the `## 🧪 External Review` section ONLY in strong mode. Its header names the reviewer (e.g.
-`(codex / openai)`); when the provider chain fell back to the subagent it reads `(claude-sonnet /
-anthropic — same-provider, weaker signal)`. List one line per Phase C disagreement; if Phase C found
-none, write `- none — reviewer agreed with the normal audit.`
-
 **Audit reports are local-only artifacts.** Before writing the report, ensure the wiki `.gitignore`
 (at the wiki root) contains the line `wiki/pages/audit-*.md`; append it if missing (self-healing for
 wikis initialized before this convention — create `.gitignore` if there is none). Audit reports
