@@ -1,6 +1,8 @@
 ---
 name: wiki-audit
-description: Use when fact-checking a single wiki page against its cited sources — verifies that every footnote actually supports its claim and surfaces uncited factual claims. Run after ingesting a high-stakes page or any time you want confidence in one page's accuracy.
+description: Use when fact-checking a single wiki page against its cited sources — verifies that
+every footnote actually supports its claim and surfaces uncited factual claims. Run after ingesting
+a high-stakes page or any time you want confidence in one page's accuracy.
 disable-model-invocation: true
 ---
 
@@ -8,7 +10,7 @@ disable-model-invocation: true
 
 Verify a single wiki page against its cited sources. Two phases: detect uncited factual claims, then
 verify cited claims by dispatching one subagent per source in parallel. In **strong mode**
-(`wiki-audit strong`) a third phase adds a cross-model adversarial review: a different-provider
+(`wiki-audit strong`) a third and fourth phase adds a cross-model adversarial review: a different-provider
 model re-examines the same claims for overreach and contradiction, and disagreements with the normal
 pass become findings.
 
@@ -41,7 +43,7 @@ Three rules:
 ```
 
 **Mode:** if the invocation arguments contain the word `strong` (e.g. `wiki-audit strong
-transformer-architecture`), enable strong mode — run Phase C (§3b) after Phase B. Otherwise run
+transformer-architecture`), enable strong mode — run Phase C (§4) and Phase D (§5) after Phase B. Otherwise run
 normal mode (Phases A and B only). The remaining argument token, if any, names the page.
 
 If the user did not name a page, ask which page to audit. Accept slug, filename, or absolute path.
@@ -136,10 +138,10 @@ fix.
 **Why per-source, not per-footnote:** PDFs are expensive to read. One read of a 30-page paper for
 five footnotes beats five reads.
 
-### 3b. Phase C — external adversarial review (strong mode only)
+### 4. Phase C — external adversarial review (strong mode only)
 
 Run this section ONLY when the audit was invoked as `wiki-audit strong`. In normal mode, skip it
-entirely and go to step 4.
+entirely and go to step 6.
 
 **1. Assemble the bounded payload** — reuse Phase B's work; do NOT re-read raw sources:
 - The full target page body.
@@ -187,7 +189,9 @@ verified:
 ```
 Carry the Phase C findings into step 4's report.
 
-### 4. Write the audit report
+### 5. Phase D - check source material for info not included in this page (strong mode only)
+
+### 6. Write the audit report
 
 Always write — do not ask permission. Path: `wiki/reports/audit-<page-slug>-<today>.md`. The
 template below uses obsidian-style slug references for readability; in the actual report, every slug

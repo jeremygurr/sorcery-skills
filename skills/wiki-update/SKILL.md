@@ -6,8 +6,8 @@ disable-model-invocation: true
 
 # Wiki Update
 
-Ingests any new source material into the wiki. Read it, then write a summary 
-page, update wiki pages, and maintain the index and overview.
+Ingests any new source material into the wiki. Read it, then write a summary page, update wiki
+pages, and maintain the index and overview.
 
 If the agent=<n> parameter is given to this skill:
 Then: subagents may be used as specified later with <n> being the maximum concurrency for those agents. 
@@ -221,6 +221,15 @@ If the subject file was modified and not newly created, then it may have referen
 existing wiki pages. Find all references to this file and check to see if they need to be updated.
 In particular, if there are line number references, those may need to be updated to new line numbers
 if that text has shifted because of the modification. 
+
+### 13. Update Non-Source Wiki Pages
+
+For each wiki page which is not of type `Sources`:
+  - Search the changed source material file for references to this wiki page's subject / concept
+  - Check to make sure the source material information about that subject is contained in the wiki
+    page
+  - Update the wiki page as necessary to reflect new or changed information from the source
+    material file.
 
 ### Common Mistakes
 

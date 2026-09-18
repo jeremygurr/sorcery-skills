@@ -146,9 +146,9 @@ You must strictly use the following template. Don't add anything to the frontmat
 ```markdown
 ---
 type: Sources
-resource: <repo relative path to source material file>
 title: <Source Title>
 description: <one-line description of the source file>
+resource: <repo relative path to source material file>
 tags: [<relevant tags>]
 generated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
 updated: { by: <current agent or harness name>/<current model>, at: <current datetime> }
