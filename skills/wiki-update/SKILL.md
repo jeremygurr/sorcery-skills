@@ -49,8 +49,11 @@ Else:
 Exclude from this list .gitignore, AGENTS.md, and everything that matches whats in the .gitignore
 file.
 
-If: a raw/ folder exists at the top of this repo
-Then: exclude from the update list all files/folders NOT in raw/
+If: A raw/ folder exists at the top of this repo.
+Then: Exclude from the update list all files/folders NOT in raw/ .
+
+If: A wiki/partial_update.txt file exists.
+Then: skip the files contained therein.
 
 Each of these files in the list is called a source material file and represents a file that has been
 changed, either created, modified, or deleted.
@@ -283,16 +286,26 @@ docs: summarize <source title>
 Wiki-Op: update
 ```
 
-### 4. Commit
+### 4. Update Status File
 
-1. Save the most recent commit hash into wiki/last_update.yml. Replace the file if it already exists. Use this template:
-``` yaml
-commit_hash: <hash>
-```
+If: 
+  More files or batches remain to be updated.
+Then:
+  Save the files that files that have been updated to wiki/partial_update.txt (append to existing
+  list of files if it already exists).
+Else:
+  Save the most recent commit hash into wiki/last_update.yml. Replace the file if it already exists. Use this template:
+  ``` yaml
+  commit_hash: <hash>
+  ```
+  Delete the wiki/partial_update.txt file if it exists.
+
+### 5. Commit
+
 
 2. Commit the changes to the repo, and push those changes to origin if there is an origin remote configured.
 
-### 5. Report to user
+### 6. Report to user
 
 - Summary page: `wiki/pages/<slug>.md`
 - Entity/concept pages created or updated: <list>

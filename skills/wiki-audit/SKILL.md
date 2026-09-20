@@ -159,24 +159,24 @@ and return them as a JSON array — nothing else. Do not restate claims that are
 Finding types:
 - "overreach": a claim generalizes beyond what its cited excerpt supports.
 - "internal-contradiction": two claims on this page conflict.
-- "external a claim conflicts with a directly-linked neighbor page.
+- "external": a claim conflicts with a directly-linked neighbor page.
 Each finding is an object: {"type": "...", "where": "<line / footnote / page ref>",
 "detail": "<one sentence>"}. Return [] if you find nothing.
 ```
 
-**4. Invoke the reviewer** in non-interactive mode:
+**3. Invoke the reviewer** in non-interactive mode:
 Dispatch one `Agent` whose prompt is the payload file's contents.
 
 If a CLI call errors, check its non-interactive usage and retry once; if it still fails, fall
 through to the subagent path. Parse the reviewer's reply as the JSON array of findings (tolerate
 surrounding prose — extract the array).
 
-**5. Filter to disagreements.** Keep only findings that Phase A/B did NOT already flag: a claim
+**4. Filter to disagreements.** Keep only findings that Phase A/B did NOT already flag: a claim
 Phase B rated `✅`/`⚠️` that the reviewer calls `overreach` is a disagreement; a contradiction
 neither phase raised is a disagreement. Discard any reviewer finding that merely repeats an existing
 Phase A/B verdict. The surviving list is the Phase C findings.
 
-**6. Stamp the `review:` frontmatter** on the AUDITED page (not the report). This is audit metadata
+**5. Stamp the `review:` frontmatter** on the AUDITED page (not the report). This is audit metadata
 — write it automatically, like the report; no content of the page changes. Add to or replace a
 `verified:` block in the page frontmatter:
 ```
