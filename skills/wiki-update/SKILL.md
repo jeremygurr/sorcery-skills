@@ -26,6 +26,8 @@ The steps from the sections below must be executed like this:
 The controller agent refers to the current agent. Worker agents are basic delegates which may be
 spawned later as instructed.
 
+If the parameter list for this skill contains the word `clean` then a clean update will occur. 
+
 ## Pre-Processing Steps
 
 ### 1. Figure out list of source files to process
@@ -35,6 +37,9 @@ update.
 
 If: one or more file paths were given to this skill as a parameter, then use those files and skip to
 the next step. 
+
+If: the word `clean` is given as a parameter for this skill, then all source material files will be
+added to the list. Skip to the next step. 
 
 If: the wiki/last_update.yml file exists
 Then: 
