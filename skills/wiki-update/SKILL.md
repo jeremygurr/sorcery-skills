@@ -35,11 +35,11 @@ If the parameter list for this skill contains the word `clean` then a clean upda
 We need a list of files that changed (added, modified, moved, or deleted) since the last wiki
 update.
 
-If: one or more file paths were given to this skill as a parameter, then use those files and skip to
-the next step. 
+If: one or more file paths were given to this skill as a parameter, then use those files as the
+basis. 
 
 If: the word `clean` is given as a parameter for this skill, then all source material files will be
-added to the list. Skip to the next step. 
+added to the list. Gather all source material files and then skip to the next step. 
 
 If: the wiki/last_update.yml file exists
 Then: 
@@ -60,21 +60,20 @@ Then: Exclude from the update list all files/folders NOT in raw/ .
 If: A wiki/partial_update.txt file exists.
 Then: skip the files contained therein.
 
+### 2. Launch processing agents
+
 Each of these files in the list is called a source material file and represents a file that has been
 changed, either created, modified, or deleted.
 
 If the list of files is more than 100:
 Then:
-  - Only process the first 100 until the end, resulting it a new commit and last_update.yml update. 
+  - Only process the first 100 until the end, resulting it a new commit. 
   - After processing is complete:
     tell the user:
     - that only 100 out of <total pages matched> were processed this round. 
     - that they need to run wiki-update again to do the next batch. 
 
-### 2. Launch processing agents
-
 Run the Source Page Processing Steps below for each file. 
-
 
 If: The agents=<n> parameter was given for this skills, 
     And there are more than 3 files in the list,
