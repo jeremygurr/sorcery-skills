@@ -1,9 +1,7 @@
 ---
 name: lavish-teach
 description: Teach the user a new skill or concept within this workspace by creating rich, reviewable HTML artifacts (HTML files) the user can annotate and send feedback on, using the lavish-axi CLI. 
-license: MIT
 metadata:
-  author: Jared Gurr (jmgurr)
   argument-hint: <what the artifact should show>
   hermes-tags: html, review, artifacts, visualization 
   hermes-category: productivity
@@ -15,9 +13,13 @@ The user has asked you to teach them something. This is a stateful request - the
 
 Treat the current directory as a teaching workspace. The state of their learning is captured in this directory in several files:
 
+- `*`: Any document or folder in the current directory related to the user-requested teach concept should be used as a source and linked as source documentation from within the generated *.html or *.md pages. Exceptions are .gitignore, AGENTS.md, and everything that matches whats in the .gitignore
+file.
 - `MISSION.md`: A document capturing the _reason_ the user is interested in the topic. This should be used to ground all teaching. Use the format in [MISSION-FORMAT.md](./MISSION-FORMAT.md).
 - `./reference/*.html`: A directory of reference materials. These are the compressed learnings from the lessons - cheat sheets, reference algorithms, syntax, yoga poses, glossaries. They are the raw units of learning. They should be beautiful documents which print out well, and are designed for quick reference.
 - `RESOURCES.md`: A list of resources which can be explored to ground your teaching in contextual knowledge, or to acquire knowledge and wisdom. Use the format in [RESOURCES-FORMAT.md](./RESOURCES-FORMAT.md).
+- `./raw/*`: A folder containing immutable read-only raw source documents which are the primary source of knowledge if it exists.
+- `./wiki/*: A folder containing updatable wiki *.md pages written in okf format to help you discover certain topics and links to source documents for contextual knowledge
 - `./learning-records/*.md`: A directory of learning records, which capture what the user has learned. These are loosely equivalent to architectural decision records in software development - they capture non-obvious lessons and key insights that may need to be revised later, or drive future sessions. These should be used to calculate the zone of proximal development. They are titled `0001-<dash-case-name>.md`, where the number increments each time. Use the format in [LEARNING-RECORD-FORMAT.md](./LEARNING-RECORD-FORMAT.md).
 - `./lessons/*.html`: A directory of lessons. A **lesson** is a single, self-contained HTML output that teaches one tightly-scoped thing tied to the mission. This is the primary unit of teaching in this workspace.
 - `./assets/*`: Reusable **components** shared across lessons. See [Assets](#assets).
@@ -96,7 +98,7 @@ The user may specify an exact thing they want to learn. If they don't, figure ou
 
 Lessons should be designed around a skill the user is going to learn. The knowledge in the lesson should be only what's required to acquire that skill. You teach the knowledge first, then get the user to practice the skills via an interactive feedback loop.
 
-Knowledge should first be gathered from trusted resources. Use `RESOURCES.md` to keep track of them. Lessons should be littered with citations - links to external resources to back up any claim made. This increases the trustworthiness of the lesson.
+Knowledge should first be gathered from trusted resources. Use `RESOURCES.md` to keep track of them. Lessons should be littered with citations - links to internal ./raw/* or the other project file resources to back up any claim made. This increases the trustworthiness of the lesson.
 
 For acquiring knowledge, difficulty is the enemy. It eats working memory you need for understanding.
 
